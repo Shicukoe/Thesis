@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thesis Workspace Portal</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Animated Background Glows -->
+  <div class="bg-glows">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="greeting" id="greeting-text">Good day, Researcher</h1>
+        <p class="subtitle" id="subtitle-date">Loading date...</p>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="app-nav">
+        <button class="nav-btn active" data-view="dashboard">
+          <i data-lucide="layout"></i>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-btn" data-view="policies">
+          <i data-lucide="file-text"></i>
+          <span>Policies</span>
+        </button>
+        <button class="nav-btn" data-view="history">
+          <i data-lucide="history"></i>
+          <span>History</span>
+        </button>
+        <button class="nav-btn" data-view="contact">
+          <i data-lucide="mail"></i>
+          <span>Contact</span>
+        </button>
+      </nav>
+
+      <div class="header-right">
+        <!-- Live Clock -->
+        <div class="clock-container">
+          <span class="clock-time" id="clock-time">00:00:00</span>
+          <span class="clock-ampm" id="clock-ampm">AM</span>
+        </div>
+        <!-- Settings Controls -->
+        <div class="header-actions">
+          <button class="btn-icon" id="settings-toggle" title="Customize Portal">
+            <i data-lucide="sliders"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- VIEW 1: DASHBOARD (PORTAL DASHBOARD) -->
+    <div id="view-dashboard" class="page-view active">
+      <!-- Search Section -->
+      <section class="search-section">
+        <div class="search-wrapper">
+          <div class="search-engine-selector">
+            <button class="engine-trigger" id="engine-trigger">
+              <i data-lucide="search" id="engine-icon"></i>
+              <span id="engine-name">Google</span>
+              <i data-lucide="chevron-down" class="chevron"></i>
+            </button>
+            <div class="engine-dropdown" id="engine-dropdown">
+              <div class="engine-option active" data-engine="google" data-url="https://www.google.com/search?q=">
+                <i data-lucide="search"></i>
+                <span>Google</span>
+              </div>
+              <div class="engine-option" data-engine="scholar" data-url="https://scholar.google.com/scholar?q=">
+                <i data-lucide="graduation-cap"></i>
+                <span>Google Scholar</span>
+              </div>
+              <div class="engine-option" data-engine="arxiv" data-url="https://arxiv.org/search/?searchtype=all&source=header&query=">
+                <i data-lucide="book-open"></i>
+                <span>arXiv</span>
+              </div>
+              <div class="engine-option" data-engine="duckduckgo" data-url="https://duckduckgo.com/?q=">
+                <i data-lucide="shield"></i>
+                <span>DuckDuckGo</span>
+              </div>
+              <div class="engine-option" data-engine="github" data-url="https://github.com/search?q=">
+                <i data-lucide="github"></i>
+                <span>GitHub</span>
+              </div>
+              <div class="engine-option" data-engine="wikipedia" data-url="https://en.wikipedia.org/wiki/Special:Search?search=">
+                <i data-lucide="globe"></i>
+                <span>Wikipedia</span>
+              </div>
+            </div>
+          </div>
+          <form class="search-form" id="search-form" action="https://www.google.com/search" method="get" target="_blank">
+            <input type="text" name="q" id="search-input" placeholder="Search the web or research databases..." autocomplete="off" autofocus>
+            <button type="submit" class="search-submit-btn" title="Search">
+              <i data-lucide="arrow-right"></i>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Main Grid Dashboard -->
+      <main class="dashboard-grid">
+        <!-- COLUMN 1: WIDGETS -->
+        <div class="grid-column col-left">
+          <!-- Weather Widget -->
+          <div class="card weather-card">
+            <div class="weather-main">
+              <div class="weather-info">
+                <span class="weather-temp" id="weather-temp">24°C</span>
+                <span class="weather-desc" id="weather-desc">Partly Cloudy</span>
+                <span class="weather-loc"><i data-lucide="map-pin"></i> Workspace Location</span>
+              </div>
+              <div class="weather-icon-container" id="weather-icon-wrapper">
+                <i data-lucide="cloud-sun" class="weather-icon"></i>
+              </div>
+            </div>
+            <div class="weather-details">
+              <div class="detail-item">
+                <span class="detail-label">Humidity</span>
+                <span class="detail-val" id="weather-humidity">62%</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Wind Speed</span>
+                <span class="detail-val" id="weather-wind">12 km/h</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Air Quality</span>
+                <span class="detail-val status-good" id="weather-aqi">Good (38)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pomodoro / Focus Timer Widget -->
+          <div class="card timer-card">
+            <div class="card-header">
+              <h3><i data-lucide="timer"></i> Focus Session</h3>
+              <span class="timer-mode" id="timer-mode">Pomodoro</span>
+            </div>
+            <div class="timer-display">
+              <div class="timer-circle">
+                <svg class="progress-ring" width="120" height="120">
+                  <circle class="progress-ring-circle-bg" stroke="rgba(0,0,0,0.05)" stroke-width="4" fill="transparent" r="54" cx="60" cy="60"/>
+                  <circle class="progress-ring-circle" stroke="var(--accent)" stroke-width="4" fill="transparent" r="54" cx="60" cy="60" id="timer-progress"/>
+                </svg>
+                <div class="timer-time" id="timer-time">25:00</div>
+              </div>
+            </div>
+            <div class="timer-controls">
+              <button class="btn btn-primary" id="timer-start"><i data-lucide="play"></i> Start</button>
+              <button class="btn btn-secondary" id="timer-reset"><i data-lucide="rotate-ccw"></i> Reset</button>
+              <button class="btn-icon small" id="timer-settings-btn" title="Toggle Mode">
+                <i data-lucide="coffee"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- COLUMN 2: BOOKMARKS & LINKS -->
+        <div class="grid-column col-center">
+          <div class="card bookmarks-card">
+            <div class="card-header">
+              <div class="bookmarks-nav">
+                <button class="bookmark-tab active" data-tab="academic">Research</button>
+                <button class="bookmark-tab" data-tab="productivity">Tools</button>
+                <button class="bookmark-tab" data-tab="social">Development</button>
+                <button class="bookmark-tab" data-tab="custom">Favorites</button>
+              </div>
+              <button class="btn btn-secondary btn-sm" id="add-bookmark-btn">
+                <i data-lucide="plus"></i> Add
+              </button>
+            </div>
+            
+            <!-- Bookmarks Grids -->
+            <div class="bookmarks-container">
+              <!-- Academic/Research -->
+              <div class="bookmarks-grid active" id="academic-grid"></div>
+              <!-- Productivity -->
+              <div class="bookmarks-grid" id="productivity-grid"></div>
+              <!-- Development -->
+              <div class="bookmarks-grid" id="social-grid"></div>
+              <!-- Custom / User Favorites -->
+              <div class="bookmarks-grid" id="custom-grid"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COLUMN 3: UTILITIES -->
+        <div class="grid-column col-right">
+          <!-- Quick Notes Widget -->
+          <div class="card notes-card">
+            <div class="card-header">
+              <h3><i data-lucide="edit-3"></i> Workspace Notepad</h3>
+              <span class="status-saved" id="note-save-status"><i data-lucide="check"></i> Saved</span>
+            </div>
+            <textarea id="notes-textarea" placeholder="Jot down quick thoughts, paper links, or search drafts... (Auto-saves)"></textarea>
+          </div>
+
+          <!-- Task List Widget -->
+          <div class="card tasks-card">
+            <div class="card-header">
+              <h3><i data-lucide="check-square"></i> Active Tasks</h3>
+              <span class="task-count" id="task-count">0 remaining</span>
+            </div>
+            <div class="task-input-wrapper">
+              <input type="text" id="task-input" placeholder="Add new milestone or task...">
+              <button id="add-task-btn" class="btn-icon" title="Add Task">
+                <i data-lucide="plus"></i>
+              </button>
+            </div>
+            <ul class="task-list" id="task-list">
+              <!-- Tasks dynamically injected -->
+            </ul>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- VIEW 2: POLICIES (ACADEMIC GUIDELINES) -->
+    <div id="view-policies" class="page-view">
+      <div class="view-header">
+        <h2 class="view-title"><i data-lucide="file-text"></i> Guidelines & Policies</h2>
+        <p class="view-subtitle">Review thesis formatting requirements, safety protocols, and laboratory policies.</p>
+      </div>
+      
+      <div class="policies-grid">
+        <!-- Academic Policies Card -->
+        <div class="card policy-card">
+          <div class="policy-badge-academic">Academic</div>
+          <h3 class="policy-title">Thesis Layout & Margins v4.2</h3>
+          <p class="policy-desc">Formatting rules, font choices, margins, and bibliography citation standards (APA/IEEE) required for final thesis submission.</p>
+          <div class="policy-meta">
+            <span><i data-lucide="calendar"></i> May 12, 2026</span>
+            <span><i data-lucide="file"></i> PDF (2.4 MB)</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="window.open('https://arxiv.org', '_blank')">
+            <i data-lucide="eye"></i> View Guide
+          </button>
+        </div>
+        
+        <!-- Ethics Card -->
+        <div class="card policy-card">
+          <div class="policy-badge-ethics">Integrity</div>
+          <h3 class="policy-title">Plagiarism & Copyright Code</h3>
+          <p class="policy-desc">Institutional standards regarding academic honesty, citation integrity, and copyright clearances for publication drafts.</p>
+          <div class="policy-meta">
+            <span><i data-lucide="calendar"></i> Jan 10, 2026</span>
+            <span><i data-lucide="file"></i> DOCX (820 KB)</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="window.open('https://arxiv.org', '_blank')">
+            <i data-lucide="eye"></i> View Guide
+          </button>
+        </div>
+
+        <!-- Safety Card -->
+        <div class="card policy-card">
+          <div class="policy-badge-safety">Safety</div>
+          <h3 class="policy-title">Laboratory Usage & Safety Code</h3>
+          <p class="policy-desc">Hours of operations, workstation allocation, software installation policies, and lab safety protocols.</p>
+          <div class="policy-meta">
+            <span><i data-lucide="calendar"></i> Jun 02, 2026</span>
+            <span><i data-lucide="file"></i> PDF (1.1 MB)</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="window.open('https://arxiv.org', '_blank')">
+            <i data-lucide="eye"></i> View Guide
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 3: HISTORY (PROCUREMENTS & ACTIVITY HISTORY) -->
+    <div id="view-history" class="page-view">
+      <div class="view-header">
+        <h2 class="view-title"><i data-lucide="history"></i> Workspace History</h2>
+        <p class="view-subtitle">Review and manage past procurement requests and milestone activity logs.</p>
+      </div>
+      
+      <div class="card orders-card-full">
+        <div class="orders-toolbar">
+          <div class="orders-search">
+            <i data-lucide="search"></i>
+            <input type="text" id="order-search-input" placeholder="Search history by name or category...">
+          </div>
+          <div class="orders-tabs">
+            <button class="orders-filter-tab active" data-filter="all">All Logs</button>
+            <button class="orders-filter-tab" data-filter="pending">Pending</button>
+            <button class="orders-filter-tab" data-filter="completed">Completed</button>
+          </div>
+          <button class="btn btn-primary" id="new-order-btn">
+            <i data-lucide="plus"></i> New Request
+          </button>
+        </div>
+        
+        <div class="orders-table-wrapper">
+          <table class="orders-table">
+            <thead>
+              <tr>
+                <th>Reference</th>
+                <th>Item / Description</th>
+                <th>Category</th>
+                <th>Date Logged</th>
+                <th>Estimated Cost</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="orders-table-body">
+              <!-- Orders injected dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 4: CONTACT (SUPPORT & CHANNELS) -->
+    <div id="view-contact" class="page-view">
+      <div class="view-header">
+        <h2 class="view-title"><i data-lucide="mail"></i> Contact Workspace Admin</h2>
+        <p class="view-subtitle">Submit support requests, report hardware issues, or inquire about advisory approvals.</p>
+      </div>
+      
+      <div class="contact-grid">
+        <!-- Contact Directory Panel -->
+        <div class="card contact-info-card">
+          <h3>Administrative Directory</h3>
+          <p class="contact-desc">Reach out directly to academic administrators, hardware engineers, or IT services.</p>
+          
+          <div class="info-list">
+            <div class="info-item">
+              <div class="info-icon"><i data-lucide="building"></i></div>
+              <div class="info-text">
+                <span class="info-label">Main Office</span>
+                <span class="info-val">Science & Tech Block B, Room 309</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon"><i data-lucide="phone"></i></div>
+              <div class="info-text">
+                <span class="info-label">Department Hotline</span>
+                <span class="info-val">+1 (555) 304-9274</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon"><i data-lucide="mail"></i></div>
+              <div class="info-text">
+                <span class="info-label">System IT Admin</span>
+                <span class="info-val">admin@thesis-portal.org</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="social-channels">
+            <h4>Academics & Repositories</h4>
+            <div class="social-buttons">
+              <a href="https://github.com" target="_blank" class="social-btn"><i data-lucide="github"></i> GitHub</a>
+              <a href="https://orcid.org" target="_blank" class="social-btn"><i data-lucide="globe"></i> ORCID ID</a>
+              <a href="https://scholar.google.com" target="_blank" class="social-btn"><i data-lucide="graduation-cap"></i> Scholar Profile</a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Interactive Form Card -->
+        <div class="card contact-form-card">
+          <h3>Submit a Support Ticket</h3>
+          <form id="contact-form" class="form-container">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="contact-name">Full Name</label>
+                <input type="text" id="contact-name" placeholder="John Doe" required>
+              </div>
+              <div class="form-group">
+                <label for="contact-email">Email Address</label>
+                <input type="email" id="contact-email" placeholder="john.doe@university.edu" required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="contact-subject">Inquiry Subject</label>
+              <select id="contact-subject">
+                <option value="General">General Inquiry</option>
+                <option value="Hardware Procurement">Hardware Procurement Help</option>
+                <option value="Software License">Software / API License Request</option>
+                <option value="Thesis Approval">Thesis Format & Advisory Approvals</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="contact-message">Detailed Description</label>
+              <textarea id="contact-message" placeholder="Provide background information on your request..." rows="5" required></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">
+              <i data-lucide="send"></i> Transmit Ticket
+            </button>
+          </form>
+          
+          <!-- Submission Confirmation (Hidden initially) -->
+          <div class="contact-success-toast" id="contact-success">
+            <div class="toast-icon"><i data-lucide="check-circle"></i></div>
+            <div class="toast-content">
+              <h4>Message Successfully Transmitted!</h4>
+              <p>Your support ticket has been received. Ticket reference: <strong>#SR-<span id="ticket-number">4029</span></strong>. A copy has been sent to your inbox.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Quote -->
+    <footer class="app-footer">
+      <div class="quote-container">
+        <p class="quote-text" id="quote-text">"Research is to see what everybody else has seen, and to think what nobody else has thought."</p>
+        <span class="quote-author" id="quote-author">— Albert Szent-Györgyi</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Add Bookmark Modal -->
+  <div class="modal-overlay" id="bookmark-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Add Bookmark</h2>
+        <button class="btn-icon" id="close-bookmark-modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="bookmark-title">Name</label>
+          <input type="text" id="bookmark-title" placeholder="e.g., Google Scholar">
+        </div>
+        <div class="form-group">
+          <label for="bookmark-url">URL</label>
+          <input type="url" id="bookmark-url" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label for="bookmark-category">Category</label>
+          <select id="bookmark-category">
+            <option value="academic">Research</option>
+            <option value="productivity">Tools</option>
+            <option value="social">Development</option>
+            <option value="custom">Favorites</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="bookmark-icon">Icon (Lucide name or Emoji)</label>
+          <input type="text" id="bookmark-icon" placeholder="e.g. book, link, globe, 💡">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancel-bookmark">Cancel</button>
+        <button class="btn btn-primary" id="save-bookmark">Save Bookmark</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Procurement Order Modal -->
+  <div class="modal-overlay" id="order-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Request Academic Procurement</h2>
+        <button class="btn-icon" id="close-order-modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="order-item">Item / Service Description</label>
+          <input type="text" id="order-item" placeholder="e.g., NVIDIA Jetson Nano Dev Kit, Overleaf Pro License">
+        </div>
+        <div class="form-group">
+          <label for="order-category">Procurement Category</label>
+          <select id="order-category">
+            <option value="Hardware">Hardware & Electronics</option>
+            <option value="Software">Software & Cloud APIs</option>
+            <option value="Literature">Books & Journals</option>
+            <option value="Services">Other / Lab Services</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="order-cost">Estimated Cost ($ USD)</label>
+          <input type="number" id="order-cost" placeholder="e.g., 299">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancel-order">Cancel</button>
+        <button class="btn btn-primary" id="save-order">Submit Request</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Drawer -->
+  <div class="drawer-overlay" id="settings-drawer">
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <h2><i data-lucide="sliders"></i> Customize Portal</h2>
+        <button class="btn-icon" id="close-settings">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="drawer-body">
+        <section class="drawer-section">
+          <h3>User Settings</h3>
+          <div class="form-group">
+            <label for="settings-username">Researcher Name</label>
+            <input type="text" id="settings-username" placeholder="Researcher">
+          </div>
+        </section>
+        
+        <section class="drawer-section">
+          <h3>Background Themes</h3>
+          <div class="theme-grid">
+            <button class="theme-preset active" data-bg="soft-mint" style="background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f8fafc 100%)">
+              <span>Soft Mint</span>
+            </button>
+            <button class="theme-preset" data-bg="lilac-glow" style="background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 50%, #f8fafc 100%)">
+              <span>Lilac Glow</span>
+            </button>
+            <button class="theme-preset" data-bg="warm-peach" style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #f8fafc 100%)">
+              <span>Warm Peach</span>
+            </button>
+            <button class="theme-preset" data-bg="pastel-sky" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f8fafc 100%)">
+              <span>Pastel Sky</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="drawer-section">
+          <h3>Reset Portal</h3>
+          <p class="drawer-help">Restore default bookmarks, clear local database and tasks.</p>
+          <button class="btn btn-danger" id="reset-data-btn">
+            <i data-lucide="trash-2"></i> Reset Local Data
+          </button>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

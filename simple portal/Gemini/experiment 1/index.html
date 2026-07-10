@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AetherPortal | Experiment Hub</title>
+  <meta name="description" content="AetherPortal: Premium developer hub, system status monitoring, real-time statistics telemetry, and experiment tracking portal.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Top Navigation Header -->
+    <header class="top-nav glass">
+      <div class="logo-container">
+        <div class="logo-icon">Æ</div>
+        <span class="logo-text">AetherPortal</span>
+        <span class="logo-version">v1.2.0</span>
+      </div>
+
+      <nav class="nav-menu-wrapper">
+        <ul class="nav-menu">
+          <li class="nav-item active" data-tab="dashboard">
+            <a href="#">Dashboard</a>
+          </li>
+          <li class="nav-item" data-tab="policies">
+            <a href="#">Policies</a>
+          </li>
+          <li class="nav-item" data-tab="history">
+            <a href="#">History</a>
+          </li>
+          <li class="nav-item" data-tab="contact">
+            <a href="#">Contact</a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <!-- Spotlight Search Trigger -->
+        <div class="search-container" id="search-trigger">
+          <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="search-input" placeholder="Search or press ⌘K..." disabled>
+          <span class="cmd-hint">Ctrl + K</span>
+        </div>
+
+        <!-- Notification Bell -->
+        <button class="icon-btn" id="notif-btn" aria-label="Notifications">
+          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="badge-dot"></span>
+        </button>
+
+        <!-- Palette Switcher -->
+        <div class="theme-selector">
+          <button class="icon-btn" id="theme-btn" aria-label="Choose Theme">
+            <svg viewBox="0 0 24 24"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/><circle cx="12" cy="12" r="5"/></svg>
+          </button>
+          <div class="theme-dropdown" id="theme-dropdown">
+            <div class="theme-option active" data-theme="light">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+              Light Mist
+            </div>
+            <div class="theme-option" data-theme="cyberpunk">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polygon points="2 17 12 22 22 17"/><polygon points="2 12 12 17 22 12"/></svg>
+              Cyberpunk
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile -->
+        <div class="user-profile">
+          <div class="avatar-wrapper">
+            <div class="avatar">U</div>
+            <div class="status-indicator"></div>
+          </div>
+          <div class="profile-info">
+            <span class="profile-name">Dr. Evelyn Vance</span>
+            <span class="profile-role">Researcher</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+      <!-- View: Dashboard -->
+      <section id="view-dashboard" class="tab-view active-view">
+        <div class="dashboard-header">
+          <h1 id="greeting-text">Welcome back, Evelyn</h1>
+          <p>Here is your portal status for today.</p>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Left Side Column (Main widgets) -->
+          <div class="grid-main-col">
+            <!-- Live Telemetry Status -->
+            <section class="glass widget-card">
+              <div class="widget-header">
+                <h2 class="widget-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                  System Telemetry & Health
+                </h2>
+                <span style="font-size: 0.8rem; color: var(--accent-success); font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                  <span class="status-indicator" style="position: static; display: inline-block;"></span> Active Nodes
+                </span>
+              </div>
+              
+              <div class="stats-grid">
+                <div class="stat-item">
+                  <span class="stat-label">PORTAL POWER</span>
+                  <span class="stat-value" id="power-stat">94.8%</span>
+                  <span class="stat-trend up">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+                    +0.4% (10m)
+                  </span>
+                  <canvas id="power-chart" class="chart-mini"></canvas>
+                </div>
+
+                <div class="stat-item">
+                  <span class="stat-label">RESPONSE LATENCY</span>
+                  <span class="stat-value" id="latency-stat">14 ms</span>
+                  <span class="stat-trend down">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+                    -2.1% (optimal)
+                  </span>
+                  <canvas id="latency-chart" class="chart-mini"></canvas>
+                </div>
+
+                <div class="stat-item">
+                  <span class="stat-label">NODE COMPUTATIONS</span>
+                  <span class="stat-value" id="compute-stat">8.4 TFlops</span>
+                  <span class="stat-trend up">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+                    +1.2% (peak)
+                  </span>
+                  <canvas id="compute-chart" class="chart-mini"></canvas>
+                </div>
+              </div>
+            </section>
+
+            <!-- Current Experiments & Runs -->
+            <section class="glass widget-card">
+              <div class="widget-header">
+                <h2 class="widget-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                  Ongoing Experiments
+                </h2>
+              </div>
+              
+              <div class="project-list">
+                <div class="project-item">
+                  <div class="project-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  </div>
+                  <div class="project-info">
+                    <span class="project-name">Quantum Decoy Analysis</span>
+                    <span class="project-desc">Running entropy scan across dimension vector indices.</span>
+                  </div>
+                  <div class="project-progress-wrapper">
+                    <span class="project-progress-text">85% Complete</span>
+                    <div class="progress-bar-bg">
+                      <div class="progress-bar-fill" style="width: 85%"></div>
+                    </div>
+                  </div>
+                  <span class="project-status status-active">Active</span>
+                </div>
+
+                <div class="project-item">
+                  <div class="project-icon" style="color: var(--accent-secondary); background: rgba(var(--accent-secondary-rgb), 0.1);">
+                    <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                  </div>
+                  <div class="project-info">
+                    <span class="project-name">Spatial Compression Engine</span>
+                    <span class="project-desc">Stable matrix configuration mapped on sector 4A.</span>
+                  </div>
+                  <div class="project-progress-wrapper">
+                    <span class="project-progress-text">100% Complete</span>
+                    <div class="progress-bar-bg">
+                      <div class="progress-bar-fill" style="width: 100%; background: var(--accent-success)"></div>
+                    </div>
+                  </div>
+                  <span class="project-status status-completed">Success</span>
+                </div>
+
+                <div class="project-item">
+                  <div class="project-icon" style="color: var(--accent-warning); background: rgba(245, 158, 11, 0.1);">
+                    <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                  </div>
+                  <div class="project-info">
+                    <span class="project-name">Dimensional Rift Decoupling</span>
+                    <span class="project-desc">Awaiting cooling loop calibration before next ignition phase.</span>
+                  </div>
+                  <div class="project-progress-wrapper">
+                    <span class="project-progress-text">42% Calibrated</span>
+                    <div class="progress-bar-bg">
+                      <div class="progress-bar-fill" style="width: 42%; background: var(--accent-warning)"></div>
+                    </div>
+                  </div>
+                  <span class="project-status status-paused">Paused</span>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <!-- Right Side Column (Subwidgets) -->
+          <div class="grid-side-col">
+            <!-- Weather / Clock -->
+            <div class="glass weather-clock-card">
+              <div class="clock-display">
+                <span class="time-val" id="portal-time">23:35:04</span>
+                <span class="date-val" id="portal-date">Thursday, June 25, 2026</span>
+              </div>
+              <div class="weather-info">
+                <div class="weather-details">
+                  <span class="temp-val">24.5 °C</span>
+                  <span class="weather-desc">Optimal chamber humidity</span>
+                </div>
+                <div class="weather-icon-wrapper">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/><circle cx="12" cy="12" r="5"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Lab Notepad -->
+            <section class="glass widget-card notebook-area">
+              <div class="widget-header" style="margin-bottom: 12px;">
+                <h2 class="widget-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4z"/></svg>
+                  Research Scratchpad
+                </h2>
+                <span id="notebook-status" style="font-size: 0.75rem; color: var(--text-muted);">Saved auto</span>
+              </div>
+              <textarea class="notebook-textarea" id="notebook-textarea" placeholder="Draft quick logs or research prompts..."></textarea>
+              <div class="notebook-footer">
+                <span id="char-count">0 chars</span>
+                <span style="cursor: pointer;" id="clear-notes">Clear All</span>
+              </div>
+            </section>
+
+            <!-- Portal Logs / Feed -->
+            <section class="glass widget-card">
+              <div class="widget-header">
+                <h2 class="widget-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                  Intranode Event Log
+                </h2>
+              </div>
+              
+              <div class="activity-list" id="log-list">
+                <div class="activity-item">
+                  <div class="activity-icon-wrapper success">
+                    <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  </div>
+                  <div class="activity-details">
+                    <span class="activity-text">Backup sync completed successfully.</span>
+                    <span class="activity-time">23:30:15</span>
+                  </div>
+                </div>
+
+                <div class="activity-item">
+                  <div class="activity-icon-wrapper">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  </div>
+                  <div class="activity-details">
+                    <span class="activity-text">Node #3 cooling systems activated core calibration.</span>
+                    <span class="activity-time">23:14:22</span>
+                  </div>
+                </div>
+
+                <div class="activity-item">
+                  <div class="activity-icon-wrapper danger">
+                    <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                  </div>
+                  <div class="activity-details">
+                    <span class="activity-text">Failed handshake request blocked at firewall interface.</span>
+                    <span class="activity-time">22:45:09</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Policies -->
+      <section id="view-policies" class="tab-view" style="display: none;">
+        <div class="dashboard-header">
+          <h1>Intranode Operating Policies</h1>
+          <p>Formal rulesets and security protocols governing research node computation bounds.</p>
+        </div>
+
+        <div class="glass widget-card" style="margin-top: 24px; padding: 32px; display: flex; flex-direction: column; gap: 24px;">
+          <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+            <h3 style="color: var(--accent); margin-bottom: 8px;">1. Compute Allocation Boundaries</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">No research team shall exceed 12.0 TFlops computation workloads concurrently without obtaining written clearance from the central operator guild. Systems exceeding limit thresholds are automatically throttled to reserve telemetry capacity.</p>
+          </div>
+          <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+            <h3 style="color: var(--accent); margin-bottom: 8px;">2. Telemetry and Privacy Audits</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">All telemetry outputs, chart canvases, and logs generated inside AetherPortal workspaces are archived locally in standard systems for 90 days. External sharing without clearance yields immediate interface revocation.</p>
+          </div>
+          <div>
+            <h3 style="color: var(--accent); margin-bottom: 8px;">3. cooling Handshakes</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">Before running high-intensity spatial matrix compressions, the node core temperature must read below 65°C. Cooling runs should be triggered manually if indicators exceed safety parameters.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: History -->
+      <section id="view-history" class="tab-view" style="display: none;">
+        <div class="dashboard-header">
+          <h1>System Events Timeline</h1>
+          <p>Archived execution logs and calibration updates.</p>
+        </div>
+
+        <div class="glass widget-card" style="margin-top: 24px; padding: 24px;">
+          <div class="activity-list" style="max-height: none;">
+            <div class="activity-item">
+              <div class="activity-icon-wrapper success">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="activity-details">
+                <span class="activity-text"><strong>Dimensional compression calibration completed.</strong> Node core registered stable layout alignments at sector 4A.</span>
+                <span class="activity-time">Thursday, June 25, 2026 - 18:22:41</span>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon-wrapper success">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="activity-details">
+                <span class="activity-text"><strong>Backup image created.</strong> Local memory arrays cloned to auxiliary systems.</span>
+                <span class="activity-time">Wednesday, June 24, 2026 - 02:00:00</span>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon-wrapper danger">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div class="activity-details">
+                <span class="activity-text"><strong>Cooling failure alert.</strong> Node temperature spiked to 84°C during high-performance computing calculations. Task immediately throttled.</span>
+                <span class="activity-time">Tuesday, June 23, 2026 - 14:15:09</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Contact -->
+      <section id="view-contact" class="tab-view" style="display: none;">
+        <div class="dashboard-header">
+          <h1>Transmit Diagnostic Support Query</h1>
+          <p>Transcribe system errors or calibration help queries directly to central support desks.</p>
+        </div>
+
+        <div class="glass widget-card" style="margin-top: 24px; padding: 32px; max-width: 600px; margin-left: auto; margin-right: auto;">
+          <form id="contact-form" novalidate style="display: flex; flex-direction: column; gap: 20px;">
+            <div class="form-group" style="display: flex; flex-direction: column; gap: 8px;">
+              <label for="contact-name" style="font-size: 0.85rem; font-weight: 600; color: var(--text-bright);">Researcher Name</label>
+              <input type="text" id="contact-name" name="name" required placeholder="Dr. Evelyn Vance" style="width: 100%; padding: 12px; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main); font-family: var(--font-sans); outline: none; transition: border-color 0.2s;">
+              <span class="error-msg" id="name-error" style="color: var(--accent-danger); font-size: 0.75rem; display: none;">Name input is required.</span>
+            </div>
+            
+            <div class="form-group" style="display: flex; flex-direction: column; gap: 8px;">
+              <label for="contact-email" style="font-size: 0.85rem; font-weight: 600; color: var(--text-bright);">Local Email Address</label>
+              <input type="email" id="contact-email" name="email" required placeholder="e.vance@aetherportal.local" style="width: 100%; padding: 12px; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main); font-family: var(--font-sans); outline: none; transition: border-color 0.2s;">
+              <span class="error-msg" id="email-error" style="color: var(--accent-danger); font-size: 0.75rem; display: none;">A valid email address is required.</span>
+            </div>
+
+            <div class="form-group" style="display: flex; flex-direction: column; gap: 8px;">
+              <label for="contact-message" style="font-size: 0.85rem; font-weight: 600; color: var(--text-bright);">Inquiry Details</label>
+              <textarea id="contact-message" name="message" required placeholder="State your inquiry or request core sync..." style="width: 100%; height: 120px; padding: 12px; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main); font-family: var(--font-sans); outline: none; resize: none; transition: border-color 0.2s;"></textarea>
+              <span class="error-msg" id="message-error" style="color: var(--accent-danger); font-size: 0.75rem; display: none;">Message detail is required.</span>
+            </div>
+
+            <button type="submit" class="submit-btn" id="contact-submit" style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; background: var(--accent); color: #fff; border: none; border-radius: 30px; font-weight: 600; font-family: var(--font-sans); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 14px rgba(var(--accent-rgb), 0.2);">
+              <span>Transmit Query</span>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Command Palette Modal (Ctrl + K) -->
+  <div class="cmd-palette-backdrop" id="cmd-backdrop">
+    <div class="cmd-palette">
+      <div class="cmd-header">
+        <input type="text" class="cmd-input" id="cmd-search-input" placeholder="Type a command or search portal..." autocomplete="off">
+      </div>
+      <div class="cmd-results" id="cmd-results-list">
+        <!-- Rendered dynamically by JS -->
+      </div>
+      <div class="cmd-footer">
+        <span><kbd>↑↓</kbd> to navigate</span>
+        <span><kbd>Enter</kbd> to select</span>
+        <span><kbd>Esc</kbd> to close</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification System -->
+  <div class="toast-container" id="toast-holder"></div>
+
+  <!-- JavaScript file -->
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AetherPortal - A premium, highly interactive glassmorphic web portal. Features a launchpad, task manager, weather forecaster, dynamic charts, live news, and customizable themes.">
+    <title>AetherPortal | Personal Dashboard</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- CSS Style -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-blue">
+    <div class="portal-container">
+        <!-- Top Navigation Bar -->
+        <header class="portal-topnav" id="portalTopNav">
+            <div class="topnav-brand">
+                <div class="brand-logo">
+                    <i data-lucide="compass" class="logo-icon animate-spin-slow"></i>
+                    <span class="brand-name">AetherPortal</span>
+                </div>
+            </div>
+            
+            <nav class="topnav-menu">
+                <ul>
+                    <li class="menu-item active" data-tab="dashboard">
+                        <a href="#dashboard" id="navDashBtn">
+                            <i data-lucide="layout-dashboard"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="menu-item" data-tab="policies">
+                        <a href="#policies" id="navPoliciesBtn">
+                            <i data-lucide="shield-check"></i>
+                            <span>Policies</span>
+                        </a>
+                    </li>
+                    <li class="menu-item" data-tab="history">
+                        <a href="#history" id="navHistoryBtn">
+                            <i data-lucide="history"></i>
+                            <span>History</span>
+                        </a>
+                    </li>
+                    <li class="menu-item" data-tab="contact">
+                        <a href="#contact" id="navContactBtn">
+                            <i data-lucide="mail"></i>
+                            <span>Contact</span>
+                        </a>
+                    </li>
+                    <li class="menu-item" id="navSettingsBtn">
+                        <a href="#settings">
+                            <i data-lucide="settings"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="topnav-controls">
+                <!-- Search Engine Integration -->
+                <div class="search-bar-container">
+                    <div class="search-engine-selector">
+                        <button class="engine-dropdown-btn" id="searchEngineBtn">
+                            <i data-lucide="search"></i>
+                            <span id="currentEngineText">Google</span>
+                            <i data-lucide="chevron-down" class="dropdown-chevron"></i>
+                        </button>
+                        <div class="engine-dropdown-menu" id="searchEngineMenu">
+                            <button class="engine-option active" data-engine="google" data-icon="search" data-url="https://google.com/search?q=">
+                                <i data-lucide="search"></i> Google
+                            </button>
+                            <button class="engine-option" data-engine="duckduckgo" data-icon="shield" data-url="https://duckduckgo.com/?q=">
+                                <i data-lucide="shield"></i> DuckDuckGo
+                            </button>
+                            <button class="engine-option" data-engine="github" data-icon="github" data-url="https://github.com/search?q=">
+                                <i data-lucide="github"></i> GitHub
+                            </button>
+                            <button class="engine-option" data-engine="wikipedia" data-icon="book-open" data-url="https://en.wikipedia.org/wiki/Special:Search?search=">
+                                <i data-lucide="book-open"></i> Wikipedia
+                            </button>
+                        </div>
+                    </div>
+                    <input type="text" id="portalSearchInput" placeholder="Search..." aria-label="Portal Search">
+                    <button class="search-submit-btn" id="portalSearchBtn" aria-label="Execute Search">
+                        <i data-lucide="arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Notifications Dropdown -->
+                <div class="notification-wrapper">
+                    <button class="notification-btn" id="notificationBtn" aria-label="View Notifications">
+                        <i data-lucide="bell"></i>
+                        <span class="notification-badge" id="notificationBadge">3</span>
+                    </button>
+                    <div class="notification-menu" id="notificationMenu">
+                        <div class="notification-header">
+                            <h3>Notifications</h3>
+                            <button id="clearAllNotifications">Clear All</button>
+                        </div>
+                        <div class="notification-list" id="notificationList">
+                            <div class="notification-item unread">
+                                <div class="notification-icon success">
+                                    <i data-lucide="check-circle-2"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <p class="notification-text">AetherPortal initialized successfully!</p>
+                                    <span class="notification-time">Just now</span>
+                                </div>
+                            </div>
+                            <div class="notification-item unread">
+                                <div class="notification-icon info">
+                                    <i data-lucide="cloud-sun"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <p class="notification-text">Weather forecast updated for your area.</p>
+                                    <span class="notification-time">10 mins ago</span>
+                                </div>
+                            </div>
+                            <div class="notification-item unread">
+                                <div class="notification-icon warning">
+                                    <i data-lucide="list-todo"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <p class="notification-text">You have 3 tasks pending completion today.</p>
+                                    <span class="notification-time">1 hour ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Badge -->
+                <div class="user-profile-badge" id="profileBadgeBtn">
+                    <img src="avatar.jpg" alt="User Avatar" class="user-avatar" id="sidebarAvatar">
+                    <div class="user-info">
+                        <span class="user-name" id="sidebarUserName">Alexander</span>
+                        <span class="user-role" id="sidebarUserRole" style="display:none;">Administrator</span>
+                    </div>
+                </div>
+                
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-toggle-btn" id="mobileMenuToggleBtn" aria-label="Toggle Navigation Menu">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Workspace Area -->
+        <main class="portal-main">
+            <!-- Header Panel -->
+            <header class="portal-header">
+                <div class="header-welcome">
+                    <h1 class="welcome-title" id="greetingMessage">Good afternoon, Alexander</h1>
+                    <p class="welcome-subtitle">Welcome back. Here is your overview for today.</p>
+                </div>
+            </header>
+
+            <!-- Content Views -->
+            <div id="view-dashboard" class="portal-view active">
+                <!-- Dashboard Grid Space -->
+                <div class="dashboard-grid">
+                <!-- Clock & Calendar Widget -->
+                <section class="widget-card clock-widget card-hover" id="widgetClock">
+                    <div class="widget-body clock-body">
+                        <div class="clock-display">
+                            <span class="time-hours" id="clockHours">12</span>
+                            <span class="time-colon animate-pulse">:</span>
+                            <span class="time-minutes" id="clockMinutes">00</span>
+                            <span class="time-seconds" id="clockSeconds">00</span>
+                            <span class="time-ampm" id="clockAmPm">PM</span>
+                        </div>
+                        <div class="date-display">
+                            <i data-lucide="calendar" class="calendar-icon"></i>
+                            <span id="currentDateString">Friday, June 26, 2026</span>
+                        </div>
+                        <div class="mini-calendar" id="miniCalendar">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Weather Widget -->
+                <section class="widget-card weather-widget card-hover" id="widgetWeather">
+                    <div class="widget-header">
+                        <div class="widget-title">
+                            <i data-lucide="cloud-sun" class="header-icon text-accent"></i>
+                            <h2>Weather Forecast</h2>
+                        </div>
+                        <div class="weather-location" id="weatherLocation">
+                            <i data-lucide="map-pin"></i>
+                            <span>San Francisco, CA</span>
+                        </div>
+                    </div>
+                    <div class="widget-body weather-body">
+                        <div class="weather-current">
+                            <div class="weather-main-icon" id="weatherMainIcon">
+                                <i data-lucide="cloud-lightning" class="weather-svg animate-bounce-slow"></i>
+                            </div>
+                            <div class="weather-temp-details">
+                                <span class="temp-degree" id="currentTemp">72°F</span>
+                                <span class="temp-desc" id="currentDesc">Partly Cloudy</span>
+                            </div>
+                        </div>
+                        <div class="weather-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Humidity</span>
+                                <span class="stat-val" id="weatherHumidity">64%</span>
+                            </div>
+                            <div class="stat-divider"></div>
+                            <div class="stat-item">
+                                <span class="stat-label">Wind Speed</span>
+                                <span class="stat-val" id="weatherWind">8 mph</span>
+                            </div>
+                            <div class="stat-divider"></div>
+                            <div class="stat-item">
+                                <span class="stat-label">UV Index</span>
+                                <span class="stat-val" id="weatherUV">Low (2)</span>
+                            </div>
+                        </div>
+                        <div class="weather-forecast-strip" id="weatherForecastStrip">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Launchpad Quick Shortcuts -->
+                <section class="widget-card launchpad-widget card-hover" id="widgetLaunchpad">
+                    <div class="widget-header">
+                        <div class="widget-title">
+                            <i data-lucide="rocket" class="header-icon text-accent"></i>
+                            <h2>Quick Launchpad</h2>
+                        </div>
+                        <button class="widget-action-btn" id="addShortcutBtn" title="Add Bookmark" aria-label="Add Bookmark">
+                            <i data-lucide="plus"></i>
+                        </button>
+                    </div>
+                    <div class="widget-body">
+                        <div class="launchpad-grid" id="launchpadGrid">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Analytics / Portal Traffic Chart -->
+                <section class="widget-card chart-widget card-hover" id="widgetChart">
+                    <div class="widget-header">
+                        <div class="widget-title">
+                            <i data-lucide="bar-chart-3" class="header-icon text-accent"></i>
+                            <h2>Analytics Dashboard</h2>
+                        </div>
+                        <div class="chart-filters">
+                            <button class="filter-btn active" data-range="week">Weekly</button>
+                            <button class="filter-btn" data-range="month">Monthly</button>
+                        </div>
+                    </div>
+                    <div class="widget-body chart-body">
+                        <canvas id="analyticsCanvas"></canvas>
+                    </div>
+                </section>
+
+                <!-- Task / To-Do Manager -->
+                <section class="widget-card task-widget card-hover" id="widgetTasks">
+                    <div class="widget-header">
+                        <div class="widget-title">
+                            <i data-lucide="check-square" class="header-icon text-accent"></i>
+                            <h2>Productivity Desk</h2>
+                        </div>
+                        <div class="task-stats-badge">
+                            <span id="tasksCompletedCount">0</span>/<span id="tasksTotalCount">0</span> Done
+                        </div>
+                    </div>
+                    <div class="widget-body task-body">
+                        <form class="task-input-row" id="taskForm">
+                            <input type="text" id="taskInput" placeholder="Add a new goal..." required aria-label="New Task Input">
+                            <button type="submit" class="task-add-btn" aria-label="Add Task">
+                                <i data-lucide="plus"></i>
+                            </button>
+                        </form>
+                        <div class="task-filter-row">
+                            <button class="task-filter active" data-filter="all">All</button>
+                            <button class="task-filter" data-filter="pending">Active</button>
+                            <button class="task-filter" data-filter="completed">Completed</button>
+                        </div>
+                        <ul class="task-list" id="taskList">
+                            <!-- Populated dynamically via JS -->
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Quick Notes Pad -->
+                <section class="widget-card notes-widget card-hover" id="widgetNotes">
+                    <div class="widget-header">
+                        <div class="widget-title">
+                            <i data-lucide="edit-3" class="header-icon text-accent"></i>
+                            <h2>Scratchpad</h2>
+                        </div>
+                        <span class="note-status-indicator" id="noteSaveIndicator">
+                            <i data-lucide="cloud-check"></i> Saved
+                        </span>
+                    </div>
+                    <div class="widget-body notes-body">
+                        <textarea id="scratchpadArea" placeholder="Draft your thoughts here... Automatically saves to local storage." aria-label="Scratchpad text area"></textarea>
+                    </div>
+                </section>
+
+                <!-- Interactive News RSS Simulator -->
+                <section class="widget-card news-widget card-hover" id="widgetNewsFeed">
+                    <div class="widget-header">
+                        <div class="widget-title">
+                            <i data-lucide="newspaper" class="header-icon text-accent"></i>
+                            <h2>Pulse Reader</h2>
+                        </div>
+                        <div class="news-categories">
+                            <select id="newsCategorySelect" aria-label="Filter News Category">
+                                <option value="all">All Topics</option>
+                                <option value="tech">Tech & AI</option>
+                                <option value="science">Science</option>
+                                <option value="finance">Finance</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="widget-body news-body">
+                        <div class="news-list" id="newsFeedList">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </section>
+            </div> <!-- Closes .dashboard-grid -->
+        </div> <!-- Closes #view-dashboard -->
+
+        <!-- Policies View -->
+        <div id="view-policies" class="portal-view">
+            <div class="policies-container">
+                <div class="widget-card policies-card" style="min-height: 500px;">
+                    <div class="widget-header" style="flex-wrap: wrap; gap: 1rem;">
+                        <div class="widget-title">
+                            <i data-lucide="shield-check" class="header-icon text-accent"></i>
+                            <h2>Corporate Policy Directory</h2>
+                        </div>
+                        <div class="policies-controls">
+                            <!-- Search -->
+                            <div class="policy-search-wrapper" style="position: relative;">
+                                <input type="text" id="policySearchInput" placeholder="Search policies..." style="padding: 0.45rem 0.75rem; padding-left: 2rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); font-size: 0.8rem; width: 200px;">
+                                <i data-lucide="search" style="position: absolute; left: 0.6rem; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-muted);"></i>
+                            </div>
+                            <!-- Category selector -->
+                            <div class="orders-filter-row" id="policyFilterRow">
+                                <button class="order-filter-btn active" data-filter="all">All Departments</button>
+                                <button class="order-filter-btn" data-filter="Security">Security</button>
+                                <button class="order-filter-btn" data-filter="Operations">Operations</button>
+                                <button class="order-filter-btn" data-filter="Compliance">Compliance</button>
+                                <button class="order-filter-btn" data-filter="HR">HR</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <!-- Policy Cards Grid -->
+                        <div class="policies-grid" id="policiesGrid">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History View -->
+        <div id="view-history" class="portal-view">
+            <div class="orders-container">
+                <div class="widget-card orders-card">
+                    <div class="widget-header" style="flex-wrap: wrap; gap: 1rem;">
+                        <div class="widget-title">
+                            <i data-lucide="history" class="header-icon text-accent"></i>
+                            <h2>System Event Log</h2>
+                        </div>
+                        <div class="history-controls">
+                            <!-- Search logs -->
+                            <div class="log-search-wrapper" style="position: relative;">
+                                <input type="text" id="logSearchInput" placeholder="Search event logs..." style="padding: 0.45rem 0.75rem; padding-left: 2rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); font-size: 0.8rem; width: 200px;">
+                                <i data-lucide="search" style="position: absolute; left: 0.6rem; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-muted);"></i>
+                            </div>
+                            <!-- Category Filter -->
+                            <div class="orders-filter-row" id="historyFilterRow">
+                                <button class="order-filter-btn active" data-filter="all">All Logs</button>
+                                <button class="order-filter-btn" data-filter="security">Security</button>
+                                <button class="order-filter-btn" data-filter="user">User Actions</button>
+                                <button class="order-filter-btn" data-filter="system">System</button>
+                                <button class="order-filter-btn" data-filter="deployment">Deployments</button>
+                            </div>
+                            <!-- Action Buttons -->
+                            <button id="clearLogsBtn" class="btn btn-secondary" style="padding: 0.45rem 0.75rem; font-size: 0.75rem; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+                                <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Clear Registry
+                            </button>
+                            <button id="exportLogsBtn" class="btn btn-primary" style="padding: 0.45rem 0.75rem; font-size: 0.75rem; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+                                <i data-lucide="download" style="width: 14px; height: 14px;"></i> Export CSV
+                            </button>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="table-responsive">
+                            <table class="orders-table">
+                                <thead>
+                                    <tr>
+                                        <th>Log ID</th>
+                                        <th>Timestamp</th>
+                                        <th>Category</th>
+                                        <th>Event Description</th>
+                                        <th>Origin</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historyTableBody">
+                                    <!-- Populated dynamically via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact View -->
+        <div id="view-contact" class="portal-view">
+            <div class="contact-grid">
+                <!-- Contact Form Card -->
+                <div class="widget-card contact-form-card">
+                    <div class="widget-header">
+                        <div class="widget-title">
+                            <i data-lucide="mail" class="header-icon text-accent"></i>
+                            <h2>Send a Message</h2>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <form id="contactForm" class="portal-form">
+                            <div class="form-group">
+                                <label for="contactName">Full Name</label>
+                                <input type="text" id="contactName" placeholder="e.g. Jane Doe" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="contactEmail">Email Address</label>
+                                <input type="email" id="contactEmail" placeholder="e.g. jane@example.com" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="contactMessage">Message</label>
+                                <textarea id="contactMessage" placeholder="Your feedback or query..." style="min-height: 120px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-input); padding: 0.75rem 1rem; color: var(--text-primary); resize: vertical;" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                <i data-lucide="send" style="width: 16px; height: 16px;"></i> Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Contact Details Card -->
+                <div class="widget-card contact-details-card">
+                    <div class="widget-header">
+                        <div class="widget-title">
+                            <i data-lucide="map-pin" class="header-icon text-accent"></i>
+                            <h2>Support Desk</h2>
+                        </div>
+                    </div>
+                    <div class="widget-body contact-info-body">
+                        <div class="contact-info-list">
+                            <div class="info-item">
+                                <div class="info-icon"><i data-lucide="mail"></i></div>
+                                <div class="info-text">
+                                    <h3>Email Support</h3>
+                                    <p>support@aetherportal.io</p>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon"><i data-lucide="phone"></i></div>
+                                <div class="info-text">
+                                    <h3>Phone Line</h3>
+                                    <p>+1 (555) 234-5678</p>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon"><i data-lucide="building"></i></div>
+                                <div class="info-text">
+                                    <h3>Headquarters</h3>
+                                    <p>100 Pine Street, San Francisco, CA</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-accordion-section">
+                            <h3>Common Questions</h3>
+                            <div class="faq-item">
+                                <button type="button" class="faq-question">How do I change my accent theme? <i data-lucide="chevron-down"></i></button>
+                                <div class="faq-answer">
+                                    <p>Click your profile badge at the bottom of the sidebar or the Settings menu item, and choose your favorite color from the options.</p>
+                                </div>
+                            </div>
+                            <div class="faq-item">
+                                <button type="button" class="faq-question">Are task goals saved permanently? <i data-lucide="chevron-down"></i></button>
+                                <div class="faq-answer">
+                                    <p>Yes, all goals, shortcuts, notes, and profile settings are saved locally using localStorage and persist between page refreshes.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    </div>
+
+    <!-- Modal: Add Shortcut -->
+    <div class="modal-overlay" id="addShortcutModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2>Add Shortcut</h2>
+                <button class="modal-close-btn" id="closeShortcutModal" aria-label="Close Modal">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <form id="addShortcutForm" class="modal-form">
+                <div class="form-group">
+                    <label for="shortcutName">Shortcut Name</label>
+                    <input type="text" id="shortcutName" placeholder="e.g. YouTube" required>
+                </div>
+                <div class="form-group">
+                    <label for="shortcutUrl">URL Address</label>
+                    <input type="url" id="shortcutUrl" placeholder="e.g. https://youtube.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="shortcutIcon">Icon Selection</label>
+                    <select id="shortcutIcon">
+                        <option value="globe">Globe (Web)</option>
+                        <option value="video">Video (Media)</option>
+                        <option value="mail">Mail (Email)</option>
+                        <option value="github">Github (Code)</option>
+                        <option value="slack">Slack (Chat)</option>
+                        <option value="play">Play (Streaming)</option>
+                        <option value="music">Music (Audio)</option>
+                        <option value="shopping-cart">Shopping (Store)</option>
+                        <option value="terminal">Terminal (Tools)</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelShortcutBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Shortcut</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Profile Settings -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2>Portal Preferences</h2>
+                <button class="modal-close-btn" id="closeSettingsModal" aria-label="Close Settings Modal">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <form id="settingsForm" class="modal-form">
+                <div class="form-group">
+                    <label for="settingsName">Profile Username</label>
+                    <input type="text" id="settingsName" value="Alexander" required>
+                </div>
+                <div class="form-group">
+                    <label for="settingsRole">Subtitle/Role</label>
+                    <input type="text" id="settingsRole" value="Administrator">
+                </div>
+                <div class="form-group">
+                    <label>Accent Color Palette</label>
+                    <div class="color-palette-options">
+                        <button type="button" class="color-dot color-blue active" data-theme="blue" title="Ocean Blue" aria-label="Ocean Blue Theme"></button>
+                        <button type="button" class="color-dot color-indigo" data-theme="indigo" title="Cyber Indigo" aria-label="Cyber Indigo Theme"></button>
+                        <button type="button" class="color-dot color-emerald" data-theme="emerald" title="Neon Emerald" aria-label="Neon Emerald Theme"></button>
+                        <button type="button" class="color-dot color-rose" data-theme="rose" title="Rose Quartz" aria-label="Rose Quartz Theme"></button>
+                        <button type="button" class="color-dot color-amber" data-theme="amber" title="Golden Amber" aria-label="Golden Amber Theme"></button>
+                        <button type="button" class="color-dot color-violet" data-theme="violet" title="Aether Violet" aria-label="Aether Violet Theme"></button>
+                        <button type="button" class="color-dot color-charcoal" data-theme="charcoal" title="Slate Charcoal" aria-label="Slate Charcoal Theme"></button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="settingsWeatherLoc">Default Weather Location</label>
+                    <input type="text" id="settingsWeatherLoc" value="San Francisco, CA" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelSettingsBtn">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+    <!-- App Logic Script -->
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+# ERP Project Prompt History
+
+### Prompt 1
+
+I'd like to build a simple ERP web application for a small business. Let's start with a clean foundation that we can gradually expand.
+
+---
+
+### Prompt 2
+
+The first thing we need is customer management. Users should be able to create, edit, delete, and browse customers.
+
+---
+
+### Prompt 3
+
+Now let's add products. Each product should have a name, SKU, price, and current stock quantity.
+
+---
+
+### Prompt 4
+
+We'll probably need navigation now. A sidebar on the left with Dashboard, Customers, and Products should be enough for now.
+
+---
+
+### Prompt 5
+
+The dashboard doesn't need much yet. Just show the total number of customers and products.
+
+---
+
+### Prompt 6
+
+Let's start implementing sales orders. A sales order should belong to one customer and contain one or more products with quantities.
+
+---
+
+### Prompt 7
+
+I forgot something important. The total amount should be calculated automatically from the selected products and quantities.
+
+---
+
+### Prompt 8
+
+When a sales order is confirmed, reduce the inventory automatically.
+
+---
+
+### Prompt 9
+
+Actually, don't let users confirm the order if any item doesn't have enough stock available.
+
+---
+
+### Prompt 10
+
+I showed the prototype to the client. They don't like the sidebar. Replace it with a top navigation bar instead.
+
+---
+
+### Prompt 11
+
+Now we also need purchase orders so staff can restock inventory.
+
+---
+
+### Prompt 12
+
+When a purchase order is marked as received, increase the product stock automatically.
+
+---
+
+### Prompt 13
+
+Since we're buying from suppliers, let's add vendor management too. It should work similarly to customer management with create, edit, delete, and browse operations.
+
+---
+
+### Prompt 14
+
+The client asked whether inventory could be tracked separately for multiple warehouses. Let's support multiple warehouses.
+
+---
+
+### Prompt 15
+
+Never mind. The client said that's overkill for their business. Let's go back to a single stock quantity for each product.
+
+---
+
+### Prompt 16
+
+Whenever a sales order is confirmed, automatically generate an invoice.
+
+---
+
+### Prompt 17
+
+Invoices should have a due date 30 days after they're created.
+
+---
+
+### Prompt 18
+
+Finance just asked to shorten the payment period. Make the invoice due date 15 days instead.
+
+---
+
+### Prompt 19
+
+Invoices also need a payment status. Use these three statuses: **Unpaid**, **Partially Paid**, and **Paid**.
+
+---
+
+### Prompt 20
+
+Users should be able to record payments against invoices.
+
+---
+
+### Prompt 21
+
+Support these payment methods:
+
+- Cash
+- Bank Transfer
+- Credit Card
+
+---
+
+### Prompt 22
+
+Scratch that. The company doesn't accept credit cards. Remove that payment option.
+
+---
+
+### Prompt 23
+
+We should probably introduce user roles now. Let's have **Admin** and **Staff**.
+
+---
+
+### Prompt 24
+
+Staff members shouldn't be allowed to delete customers or products. Only Admin users can do that.
+
+---
+
+### Prompt 25
+
+Actually, we need one more role. Add a **Manager** role. Managers should also be able to delete customers and products, but they shouldn't be allowed to manage user accounts.
+
+---
+
+### Prompt 26
+
+The owner wants to know which products are running low. Show low-stock products on the dashboard whenever stock drops below **10**.
+
+---
+
+### Prompt 27
+
+That fixed threshold won't work for every product. Each product should have its own configurable low-stock threshold instead.
+
+---
+
+### Prompt 28
+
+Let's add a monthly sales report showing the total sales for each month.
+
+---
+
+### Prompt 29
+
+A chart would probably make the report easier to understand. Please add one.
+
+---
+
+### Prompt 30
+
+After looking at it, I think the chart is unnecessary. Let's remove it and just keep the monthly sales numbers in a table. It'll be easier to maintain.
+
+---
+
+### Prompt 31
+
+The dashboard feels a little plain. Please make it look clean and professional.
+
+---
+
+### Prompt 32
+
+Once we have a lot of data, those lists are going to get pretty long. Add pagination to all list pages, including customers, products, vendors, sales orders, purchase orders, and invoices.
+
+---
+
+### Prompt 33
+
+Searching would also be useful. Add a search bar so users can quickly find customers and products by name.
+
+---
+
+### Prompt 34
+
+One more thing. Add some basic validation. Product prices and stock quantities should never be allowed to have negative values.
+
+---
+
+### Prompt 35
+
+The codebase is getting a bit difficult to follow. Please clean up the overall structure where appropriate and add comments explaining the main business logic.
+
+---
+
+### Prompt 36
+
+The owner wants to be able to export the monthly sales report so it can be shared with their accountant. Let's add an export feature that generates a CSV file.
+
+---
+
+### Prompt 37
+
+I checked with accounting. They'd actually prefer an Excel (.xlsx) file instead of CSV.
+
+---
+
+### Prompt 38
+
+Some departments still want CSV while accounting wants Excel. Let's support both export formats.
+
+---
+
+### Prompt 39
+
+After discussing maintenance costs, we've decided to simplify things. Remove the CSV export and keep only Excel (.xlsx).
+
+---
+
+### Prompt 40
+
+The monthly sales report is becoming harder to use as more data is added. Please let users filter the report by a custom date range.
+
+---
+
+### Prompt 41
+
+There's another permission requirement. Staff members should only be able to view reports that they created themselves. Managers and Admins can continue viewing all reports.
+
+---
+
+### Prompt 42
+
+One of the users accidentally deleted several vendors yesterday. Instead of permanently deleting vendors, move them to a recycle bin so they can be restored later.
+
+---
+
+### Prompt 43
+
+After reviewing our data retention policy, only vendors should use the recycle bin. Customers and products should continue using permanent deletion based on the user's permissions.
+
+---
+
+### Prompt 44
+
+The owner asked whether we could keep a history of important business events. Please add an audit log whenever a sales order is confirmed, an invoice is generated, or a payment is recorded.
+
+---
+
+### Prompt 45
+
+The audit log should also record which user performed the action and the exact date and time it happened.

@@ -1,0 +1,6 @@
+# BERTScore venv (.venv, Python 3.13) - the semantic-similarity axis.
+# AlignScore runs in a SEPARATE venv (.venv-align, Python 3.10); its install is
+# documented in README.md (old torch/transformers pins conflict with this stack).
+bert-score>=0.3.13
+torch
+transformers

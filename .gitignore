@@ -1,0 +1,46 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# ===== Virtual environments (huge, machine-specific) =====
+.venv/
+.venv-align/
+venv/
+env/
+
+# ===== Models / checkpoints / caches (multi-GB, live on D:, never commit) =====
+# AlignScore repo clone, AlignScore-*.ckpt, HF/pip/tmp caches under Evaluation/.models
+.models/
+*.ckpt
+*.pt
+*.bin
+*.safetensors
+nltk_data/
+
+# ===== Node (built experiment apps, if any) =====
+node_modules/
+dist/
+build/
+.next/
+.vite/
+coverage/
+
+# ===== Editor / OS =====
+.idea/
+.DS_Store
+Thumbs.db
+
+# ===== Office lock / temp files (e.g. ~$AI_masterprompt_plan.docx) =====
+~$*
+*.tmp
+
+# ===== Claude Code / local agent tooling state =====
+.claude/
+.agents/
+skills-lock.json
+# ===== Third-party paper PDFs (copyrighted) =====
+# Remove this line if the repo is PRIVATE and you want to keep the papers.
+papers/

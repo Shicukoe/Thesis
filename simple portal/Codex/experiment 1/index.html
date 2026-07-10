@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Campus Portal</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <main class="content">
+        <header class="site-header">
+          <a class="brand" href="#" aria-label="Campus Portal home">
+            <span class="brand-mark" aria-hidden="true">CP</span>
+            <span>
+              <strong>Campus Portal</strong>
+              <small>Student workspace</small>
+            </span>
+          </a>
+
+          <nav class="nav-list" aria-label="Portal sections">
+            <a class="nav-item active" data-initial="D" href="#">
+              <span class="icon" aria-hidden="true">⌂</span>
+              Dashboard
+            </a>
+            <a class="nav-item" data-initial="P" href="#">
+              <span class="icon" aria-hidden="true">▤</span>
+              Policies
+            </a>
+            <a class="nav-item" data-initial="H" href="#">
+              <span class="icon" aria-hidden="true">▣</span>
+              History
+            </a>
+            <a class="nav-item" data-initial="C" href="#">
+              <span class="icon" aria-hidden="true">✉</span>
+              Contact
+            </a>
+          </nav>
+        </header>
+
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Spring term</p>
+            <h1>Welcome back, Alex</h1>
+          </div>
+
+          <form class="search" role="search">
+            <label class="sr-only" for="portal-search">Search portal</label>
+            <span aria-hidden="true">⌕</span>
+            <input id="portal-search" type="search" placeholder="Search courses, forms, fees">
+          </form>
+        </header>
+
+        <section class="hero-band" aria-label="Portal overview">
+          <div class="hero-copy">
+            <p class="eyebrow">Today at a glance</p>
+            <h2>3 classes, 2 pending tasks, 1 new announcement</h2>
+            <p>Everything you need for the day is collected here, from class links to payments and academic requests.</p>
+            <div class="hero-actions">
+              <a class="primary-action" href="#">Join next class</a>
+              <a class="secondary-action" href="#">View full schedule</a>
+            </div>
+          </div>
+
+          <div class="portal-visual" aria-hidden="true">
+            <div class="window-bar">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="visual-grid">
+              <span class="visual-tile tall"></span>
+              <span class="visual-tile"></span>
+              <span class="visual-tile accent"></span>
+              <span class="visual-tile wide"></span>
+              <span class="visual-tile"></span>
+            </div>
+          </div>
+        </section>
+
+        <section class="quick-actions" aria-label="Quick actions">
+          <a class="action-card" href="#">
+            <span class="action-icon">▣</span>
+            <strong>Course materials</strong>
+            <small>Open current modules</small>
+          </a>
+          <a class="action-card" href="#">
+            <span class="action-icon">↗</span>
+            <strong>Submit request</strong>
+            <small>Forms and approvals</small>
+          </a>
+          <a class="action-card" href="#">
+            <span class="action-icon">◫</span>
+            <strong>Pay tuition</strong>
+            <small>Invoices and receipts</small>
+          </a>
+          <a class="action-card" href="#">
+            <span class="action-icon">✉</span>
+            <strong>Messages</strong>
+            <small>Inbox and support</small>
+          </a>
+        </section>
+
+        <div class="dashboard-grid">
+          <section class="panel schedule-panel" aria-labelledby="schedule-title">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Schedule</p>
+                <h2 id="schedule-title">Next classes</h2>
+              </div>
+              <a href="#">See all</a>
+            </div>
+
+            <ol class="timeline">
+              <li>
+                <time datetime="09:00">09:00</time>
+                <div>
+                  <strong>Database Systems</strong>
+                  <span>Room B204 · Dr. Nguyen</span>
+                </div>
+              </li>
+              <li>
+                <time datetime="13:30">13:30</time>
+                <div>
+                  <strong>Software Engineering</strong>
+                  <span>Online · Team project review</span>
+                </div>
+              </li>
+              <li>
+                <time datetime="16:00">16:00</time>
+                <div>
+                  <strong>Research Methods</strong>
+                  <span>Lab 3 · Thesis workshop</span>
+                </div>
+              </li>
+            </ol>
+          </section>
+
+          <section class="panel" aria-labelledby="tasks-title">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">To do</p>
+                <h2 id="tasks-title">Pending tasks</h2>
+              </div>
+              <span class="badge">2 due</span>
+            </div>
+
+            <ul class="task-list">
+              <li>
+                <label>
+                  <input type="checkbox">
+                  <span>Upload thesis proposal revision</span>
+                </label>
+                <time datetime="2026-07-02">Jul 2</time>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox">
+                  <span>Confirm internship placement</span>
+                </label>
+                <time datetime="2026-07-05">Jul 5</time>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" checked>
+                  <span>Complete course feedback</span>
+                </label>
+                <time datetime="2026-06-28">Done</time>
+              </li>
+            </ul>
+          </section>
+
+          <section class="panel" aria-labelledby="status-title">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Progress</p>
+                <h2 id="status-title">Degree status</h2>
+              </div>
+              <span class="badge good">On track</span>
+            </div>
+
+            <div class="progress-ring" role="img" aria-label="78 percent of degree credits completed">
+              <span>78%</span>
+            </div>
+
+            <dl class="status-list">
+              <div>
+                <dt>Completed credits</dt>
+                <dd>112 / 144</dd>
+              </div>
+              <div>
+                <dt>Current GPA</dt>
+                <dd>3.62</dd>
+              </div>
+            </dl>
+          </section>
+
+          <section class="panel announcements" aria-labelledby="announcements-title">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Updates</p>
+                <h2 id="announcements-title">Announcements</h2>
+              </div>
+              <a href="#">Archive</a>
+            </div>
+
+            <article>
+              <span class="notice-dot"></span>
+              <div>
+                <strong>Library hours extended during final review week</strong>
+                <p>Main library study rooms are available until 22:00 from Monday through Friday.</p>
+              </div>
+            </article>
+            <article>
+              <span class="notice-dot muted"></span>
+              <div>
+                <strong>Scholarship application window opens next month</strong>
+                <p>Eligible students can prepare transcripts and recommendation letters in advance.</p>
+              </div>
+            </article>
+          </section>
+        </div>
+
+        <section class="panel contact-panel" aria-labelledby="contact-title">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Contact</p>
+              <h2 id="contact-title">Send a message</h2>
+            </div>
+          </div>
+
+          <form class="contact-form" novalidate>
+            <div class="field">
+              <label for="contact-name">Name</label>
+              <input id="contact-name" name="name" type="text" autocomplete="name" required>
+            </div>
+
+            <div class="field">
+              <label for="contact-email">Email</label>
+              <input id="contact-email" name="email" type="email" autocomplete="email" required>
+              <span class="field-error" aria-live="polite"></span>
+            </div>
+
+            <div class="field full">
+              <label for="contact-message">Message</label>
+              <textarea id="contact-message" name="message" rows="5" required></textarea>
+            </div>
+
+            <button class="form-submit" type="submit">Submit</button>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const contactForm = document.querySelector(".contact-form");
+      const emailInput = document.querySelector("#contact-email");
+      const emailError = document.querySelector(".field-error");
+
+      contactForm.addEventListener("submit", (event) => {
+        if (!emailInput.validity.valid) {
+          event.preventDefault();
+          emailError.textContent = "Enter a valid email address.";
+          emailInput.focus();
+          return;
+        }
+
+        emailError.textContent = "";
+      });
+
+      emailInput.addEventListener("input", () => {
+        if (emailInput.validity.valid) {
+          emailError.textContent = "";
+        }
+      });
+    </script>
+  </body>
+</html>

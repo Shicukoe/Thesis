@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="logo">Portal</div>
+    <nav class="main-nav">
+      <button type="button" class="nav-btn active" data-page="dashboard">Dashboard</button>
+      <button type="button" class="nav-btn" data-page="policies">Policies</button>
+      <button type="button" class="nav-btn" data-page="history">History</button>
+      <button type="button" class="nav-btn" data-page="contact">Contact</button>
+    </nav>
+  </header>
+
+  <main class="content">
+    <section id="page-dashboard" class="page active">
+      <h1>Dashboard</h1>
+      <p>Your overview will appear here.</p>
+    </section>
+
+    <section id="page-policies" class="page">
+      <h1>Policies</h1>
+      <p>Policy documents will appear here.</p>
+    </section>
+
+    <section id="page-history" class="page">
+      <h1>History</h1>
+      <p>Your activity history will appear here.</p>
+    </section>
+
+    <section id="page-contact" class="page">
+      <h1>Contact</h1>
+      <p>Reach out to us with any questions.</p>
+
+      <form id="contact-form" class="contact-form" novalidate>
+        <div class="form-field">
+          <label for="contact-name">Name</label>
+          <input type="text" id="contact-name" name="name" required>
+          <span class="field-error" id="contact-name-error"></span>
+        </div>
+
+        <div class="form-field">
+          <label for="contact-email">Email</label>
+          <input type="email" id="contact-email" name="email" required>
+          <span class="field-error" id="contact-email-error"></span>
+        </div>
+
+        <div class="form-field">
+          <label for="contact-message">Message</label>
+          <textarea id="contact-message" name="message" rows="5" required></textarea>
+          <span class="field-error" id="contact-message-error"></span>
+        </div>
+
+        <button type="submit" class="submit-btn">Send Message</button>
+        <p class="form-success" id="contact-form-success" hidden>Thanks! Your message has been sent.</p>
+      </form>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
