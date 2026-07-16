@@ -24,6 +24,4 @@ Add pagination to the customer, product, vendor, sales order, purchase order, an
 
 Add search functionality so users can find customers and products by name.
 
-Clean up the overall code structure where appropriate and add comments explaining the main business logic.
-
 Implement an audit log that records whenever a sales order is confirmed, an invoice is generated, or a payment is recorded. Each audit log entry must include the user who performed the action and the exact date and time it occurred.

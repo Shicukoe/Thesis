@@ -12,15 +12,25 @@ Run:
     .venv-align/Scripts/python.exe src/run_align.py
 """
 from __future__ import annotations
+import argparse
 
 from common import DATA, OUT, clean_prompt, ensure_dir, read_text, write_csv
 from run import discover  # reuse the same project/candidate discovery
 
-CKPT = "D:/Coding_Stuffs/Thesis/Evaluation/.models/AlignScore-base.ckpt"
+MODELS = {
+    "base":  dict(model="roberta-base",  ckpt="D:/Coding_Stuffs/Thesis/Evaluation/.models/AlignScore-base.ckpt"),
+    "large": dict(model="roberta-large", ckpt="D:/Coding_Stuffs/Thesis/Evaluation/.models/AlignScore-large.ckpt"),
+}
 _COLS = ["project", "candidate", "align_precision", "align_recall"]
 
 
 def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--size", choices=list(MODELS), default="base",
+                    help="AlignScore checkpoint (base=roberta-base, large=roberta-large, stronger/slower)")
+    args = ap.parse_args()
+    cfg = MODELS[args.size]
+
     from alignscore import AlignScore
 
     items = []  # (project, label, cand_text, gt_text)
@@ -35,8 +45,9 @@ def main() -> None:
         print("No candidates found.")
         return
 
-    scorer = AlignScore(model="roberta-base", batch_size=32, device="cpu",
-                        ckpt_path=CKPT, evaluation_mode="nli_sp")
+    scorer = AlignScore(model=cfg["model"], batch_size=32, device="cpu",
+                        ckpt_path=cfg["ckpt"], evaluation_mode="nli_sp")
+    print(f"AlignScore size={args.size} ({cfg['model']})")
 
     gts = [g for _, _, _, g in items]
     cands = [c for _, _, c, _ in items]
