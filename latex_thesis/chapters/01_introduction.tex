@@ -1,0 +1,162 @@
+\chapter{Introduction}
+\label{chap:introduction}
+
+\section{Motivation}
+\label{sec:motivation}
+
+When developers work with AI coding agents, the requirements of a project are
+rarely expressed in a single instruction. Instead, the developer's intent
+evolves across a long and unstructured prompt history containing initial
+requests, follow-up questions, corrections, removals, replacements, and changes
+of direction. Although this history records how the project developed, it does
+not provide a clear description of what the project should be in its current
+state. Earlier requirements may no longer apply, later prompts may replace
+previous values, and some messages may concern temporary implementation
+decisions rather than the intended product.
+
+To make the project easier to continue or transfer, developers can create a
+\emph{master prompt}. In this thesis, a master prompt is a single,
+self-contained specification of the user's currently valid intent. It should
+describe what must be built without requiring another developer or AI agent to
+read the entire prompt history. It should keep active requirements, reflect
+later changes, and leave out requirements that were removed or replaced.
+
+Recently, AI coding agents can build much of a software project from a clear set
+of prompts. This makes the prompts used to describe the project an important
+part of the project itself. Work on spec-driven development also shows that a
+written specification can be kept and used to guide the generated code
+\citep{piskala2026specdriven}. In the same way, a master prompt can be treated
+as a useful project artifact rather than a temporary summary. It can be saved,
+updated, and kept together with the code so that the project can be continued
+in another AI session, by another coding agent, or by another developer.
+
+However, creating a faithful master prompt is not only a summarization task.
+The agent must separate what the user actually requested from details that
+appeared during implementation. In practical coding, an AI agent may add architectural
+patterns, filenames, technologies, validation rules, or other choices that the
+user never asked for. This problem is closely related to \emph{extrinsic hallucination}, which
+\citet{ji2023survey} describe as generated content that is not supported by
+the source. In master-prompt consolidation, these unsupported additions may
+make the result appear more complete while reducing its faithfulness to the
+user's original requests.
+
+The main concern is therefore not only whether an AI agent can produce a
+clear and compact document, but whether every requirement in that document is
+traceable to the prompt history. A faithful master prompt should preserve all
+currently valid requirements, correctly reflect removals and replacements, and
+exclude both agent-added details and outdated requirements. Although carefully
+written consolidation instructions may improve the result, it remains unclear
+how strongly instruction strictness affects traceability and whether stricter
+prompting continues to improve the result for longer and more realistic
+development histories.
+
+A second challenge arises when the master prompt is treated not only as the
+output of a one-time consolidation process, but as a persistent project
+artifact. After handoff, a later session or another contributor may introduce a
+new instruction that contradicts a requirement already established in the
+master prompt. Such contradictions may use different wording that may unintentionally
+modify, replace, or even remove already existing requirements without recognizing the contradiction.
+Moreover, they may appear in different parts of the master prompt rather than next to each
+other. They are therefore semantic conflicts rather than text-level merge conflicts.
+If the agent silently chooses one value, combines incompatible requirements,
+or overwrites the existing requirement, the master prompt can no longer serve
+as a reliable representation of the project's intent.
+
+Together, these problems motivate a spec-guided approach that keeps the current requirements
+and their sources explicit, and checks each new instruction against the
+existing specification before updating it.
+
+\section{Problem Statement}
+\label{sec:problem-statement}
+
+This thesis studies two connected problems in AI-assisted master prompt
+construction:
+
+\begin{itemize}[leftmargin=*]
+\item \textbf{Non-traceable consolidation.}
+This problem occurs when an agent consolidates the full prompt history. The
+resulting master prompt may contain details that the user never requested,
+such as technologies, filenames, design choices, or added rules. It may also
+retain old requirements after they were removed, undone, or replaced. At the
+same time, some valid requirements may be omitted. These errors make the
+master prompt less faithful even when its wording is clear and its overall
+meaning appears similar to the original history.
+
+\item \textbf{Semantic conflict in a persistent master prompt.}
+This problem occurs when a new prompt is added after the master prompt has
+already been created. The new instruction may contradict an existing
+requirement, but the agent may fail to report the conflict. Instead, it may
+silently overwrite the old value, combine two incompatible values, or keep
+both requirements in different parts of the document. In each case, the
+master prompt no longer provides one consistent description of the project.
+\end{itemize}
+
+To address these problems, this thesis evaluates several single-pass
+consolidation instructions and proposes a \emph{spec-guided} approach. Rather
+than consolidating the raw prompt history only at the end of a session, the
+proposed approach maintains an explicit specification of the current user
+intent under a governance instruction. Each new prompt is checked against the
+existing requirements before the specification is updated. Potential conflicts
+are surfaced together with their source requirements instead of being silently
+resolved.
+
+\section{Research Questions}
+\label{sec:research-questions}
+
+\begin{description}[leftmargin=*,style=nextline]
+\item[RQ1]
+To what extent do AI-generated master prompts contain non-traceable content,
+including agent-added requirements and outdated requirements that should
+have been removed or replaced? How does consolidation instruction strictness
+(\emph{basic}, \emph{loose}, and \emph{strict}) affect this problem?
+
+\item[RQ2]
+Does a spec-guided consolidation approach produce a more traceable master
+prompt than single-pass consolidation of the raw prompt history using basic,
+loose, or strict instructions?
+
+\item[RQ3]
+When a later instruction semantically conflicts with a settled requirement,
+how can a spec-guided approach surface the conflict, trace it to both
+requirements, and avoid resolving it without user input?
+\end{description}
+
+\section{Contributions}
+\label{sec:contributions}
+
+This thesis makes the following contributions:
+
+\begin{itemize}[leftmargin=*]
+
+\item A requirement-level evaluation method for master-prompt traceability.
+Instead of comparing whole documents, the method splits each master prompt
+into atomic requirements and uses entailment-based scoring with AlignScore
+\citep{zha2023alignscore} to determine whether each requirement is supported
+by the human-consolidated ground truth. Paired examples are also used to show
+why word similarity alone is not a reliable measure of traceability. Applied
+to 24 master-prompt candidates produced by three agents, four consolidation
+approaches, and two projects, the method answers RQ1 by showing that stricter
+single-pass instructions reduce non-traceable content, but the improvement
+stops before reaching the ground truth
+(\cref{chap:experiment-traceability}).
+
+\item A consolidation method called \texttt{spec\_guided}, which maintains a
+living specification under an explicit governance instruction. Instead of
+rebuilding the master prompt from the full prompt history only at the end of
+the session, the method checks each new prompt and updates the specification
+throughout the session. This method answers RQ2. Compared with each agent's
+own single-pass baseline, it improves traceability in four of the six
+agent--project pairs. Manual analysis of the other two pairs identifies
+trade-offs caused by making requirement decisions repeatedly during the
+session rather than once at the end
+(\cref{chap:experiment-traceability}).
+
+\item A project-handoff method for identifying semantic conflicts in a settled
+master prompt. The method uses a separate governance instruction that checks
+each later prompt against the existing specification, preserves settled
+requirements when the intended change is unclear, and records both conflicting
+requirements for the user to resolve. The method is demonstrated using five
+constructed conflicts and two compatible controls across the simple and hard
+projects (\cref{chap:experiment-conflict}).
+
+\end{itemize}

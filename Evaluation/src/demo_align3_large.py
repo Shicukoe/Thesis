@@ -1,4 +1,10 @@
-"""Score the 3 demo pairs with AlignScore-LARGE (both directions) for the report table."""
+"""Score the 3 demo pairs with AlignScore-large for the report table, using the
+metric exactly as released (https://github.com/yuh-zha/AlignScore).
+
+AlignScore = one function ALIGN(context, claim) -> a single [0,1] score. Used
+in the canonical direction only: ALIGN(context=ground_truth, claim=candidate)
+(is the candidate supported by the ground truth?). One number per pair.
+"""
 from alignscore import AlignScore
 
 CKPT = "D:/Coding_Stuffs/Thesis/Evaluation/.models/AlignScore-large.ckpt"
@@ -15,6 +21,6 @@ PAIRS = [
 s = AlignScore(model="roberta-large", batch_size=32, device="cpu",
                ckpt_path=CKPT, evaluation_mode="nli_sp")
 for label, gt, cand in PAIRS:
-    p = s.score(contexts=[gt], claims=[cand])[0]
-    r = s.score(contexts=[cand], claims=[gt])[0]
-    print(f"  P={p:.4f} R={r:.4f}  {label}")
+    # AlignScore = ALIGN(context=ground_truth, claim=candidate), single direction.
+    alignscore = s.score(contexts=[gt], claims=[cand])[0]
+    print(f"  AlignScore={alignscore:.4f}  {label}")

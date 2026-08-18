@@ -105,3 +105,60 @@ def split_requirements(text: str) -> list[str]:
         if unit:
             reqs.append(unit)
     return reqs
+
+
+# ---- hand-written ATOMIC requirement files (the gold split, e.g. requirements_split.md,
+# and the per-candidate atomic splits). Unlike split_requirements (which cuts by
+# punctuation), these are units a human already decided on, so we parse them as authored.
+_ATOMIC_HEADER = re.compile(r"(?m)^#{1,6}[ \t]+Requirement\b[^\n]*$")
+_NOTE_LINE = re.compile(r"^(?:\*\*|>)")  # **Splitting note:** / **Correction:** / blockquote
+
+
+def load_atomic_requirements(text: str) -> list[str]:
+    """Parse a hand-written atomic-requirement file into a flat list of requirement
+    strings. Supports two layouts:
+
+      (1) `### Requirement N - Prompt X` headers, each followed by the requirement text
+          as a short paragraph. Notes/corrections/alternatives (lines starting with `**`
+          or `>`) and any `## Module` / `## Method` / `## Added-then-...` sections that
+          are not `### Requirement` blocks are ignored. This matches requirements_split.md.
+
+      (2) A plain list: one requirement per non-blank line (markdown bullets / numbering /
+          `#` headers / `---` rules / `**...**` notes are dropped).
+
+    Every word of the requirement text is kept; only structure/formatting is stripped.
+    """
+    text = _HTML_COMMENT.sub(" ", text)
+    if _ATOMIC_HEADER.search(text):
+        return _parse_requirement_blocks(text)
+    return _parse_requirement_lines(text)
+
+
+def _parse_requirement_blocks(text: str) -> list[str]:
+    reqs = []
+    # split on each '### Requirement ...' header; section = text until the next such header
+    for section in _ATOMIC_HEADER.split(text)[1:]:
+        buf = []
+        for line in section.splitlines():
+            s = line.strip()
+            if not s or s.startswith("#") or _NOTE_LINE.match(s) or _MD_RULE.match(s):
+                if buf:
+                    break           # blank / note / next header ends the requirement paragraph
+                continue            # skip leading blanks / notes before the requirement text
+            buf.append(s)
+        unit = clean_prompt(" ".join(buf))
+        if unit:
+            reqs.append(unit)
+    return reqs
+
+
+def _parse_requirement_lines(text: str) -> list[str]:
+    reqs = []
+    for line in text.splitlines():
+        s = line.strip()
+        if not s or s.startswith("#") or _NOTE_LINE.match(s) or _MD_RULE.match(s):
+            continue
+        unit = clean_prompt(s)
+        if unit:
+            reqs.append(unit)
+    return reqs

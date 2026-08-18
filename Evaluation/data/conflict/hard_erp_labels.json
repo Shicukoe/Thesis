@@ -1,0 +1,37 @@
+{
+  "history_file": "hard_erp_conflict_history.md",
+  "note": "Ground-truth semantic conflicts. M is the hand-built ground-truth master prompt (../hard_erp/ground_truth.md), a faithful consolidation of prompts 1-45. Each conflict is a later prompt (46-49) that re-asserts a value incompatible with one already settled in M, with no explicit change reconciling them. Provenance is the source PROMPT number (not a person). Resolved edit chains inside 1-45 (add-then-undo, 'instead') belong to RQ1/RQ2, not here.",
+  "conflicts": [
+    {
+      "id": "C1_invoice_due_date",
+      "type": "presupposition_value",
+      "settled": {"prompt": 18, "text": "Make the invoice due date 15 days instead."},
+      "conflicting": {"prompt": 46, "text": "Add an automated reminder email that is sent to the customer three days before an invoice reaches its 30-day due date."},
+      "reason": "The reminder presupposes a 30-day due date; the due date is settled at 15 days (prompt 18). The feature cannot be built without contradicting the settled value, and no change wording is used."
+    },
+    {
+      "id": "C2_recycle_bin_scope",
+      "type": "presupposition_scope",
+      "settled": {"prompt": 43, "text": "Only vendors should use the recycle bin. Customers and products should continue using permanent deletion."},
+      "conflicting": {"prompt": 47, "text": "On the customers page, add a Recycle bin tab that lists deleted customers with a Restore button."},
+      "reason": "A customer recycle-bin tab presupposes customers are soft-deleted and restorable; prompt 43 settles that only vendors use the recycle bin and customers use permanent deletion."
+    },
+    {
+      "id": "C3_navigation_layout",
+      "type": "presupposition_contradiction",
+      "settled": {"prompt": 10, "text": "Replace it with a top navigation bar instead."},
+      "conflicting": {"prompt": 48, "text": "Add a button that lets users collapse and expand the left sidebar to free up screen space."},
+      "reason": "A collapse/expand toggle for the left sidebar presupposes the app uses a left sidebar; the navigation is settled as a top bar (prompt 10)."
+    },
+    {
+      "id": "C4_staff_delete_permission",
+      "type": "presupposition_constraint",
+      "settled": {"prompt": 24, "text": "Staff members shouldn't be allowed to delete customers or products."},
+      "conflicting": {"prompt": 49, "text": "In the audit log, capture the event whenever a staff member deletes one of their own products."},
+      "reason": "Auditing a staff member deleting their own product presupposes staff can delete products; prompt 24 settles that staff cannot delete customers or products."
+    }
+  ],
+  "compatible_additions": [
+    {"id": "P1_invoice_print", "prompt": 50, "text": "Add a print button on the invoice detail page so a user can print a paper copy of an invoice.", "why_not_conflict": "A genuinely new feature that contradicts nothing settled in M. Positive control: the method must fold it into the master prompt and must NOT flag it as a conflict (guards against over-flagging)."}
+  ]
+}

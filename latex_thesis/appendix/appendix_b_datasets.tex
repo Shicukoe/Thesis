@@ -1,0 +1,305 @@
+\chapter{Datasets and Experimental Prompts}
+\label{app:datasets}
+
+This appendix provides the exact inputs used in the experiments. It contains
+the common session-setup prompt, the consolidation instructions used in
+Experiment~1, the Experiment~1 \texttt{spec\_guided} governance instruction,
+the requirement-decomposition prompt, both project histories, the common
+handoff prompt and later instructions used in Experiment~2, and the separate
+governance instruction used by its \emph{spec-guided} condition.
+
+All prompts inside the listings are reproduced verbatim. The project
+histories are the inputs from which the candidates were produced and the
+ground-truth master prompts were manually constructed
+(\cref{sec:method-dataset}).
+
+\section{Pre-Experiment Session Setup}
+\label{sec:pre-experiment}
+
+Before the first numbered project prompt, every session received the same
+setup message. This applies to all 24 candidates in Experiment~1 and every run
+in Experiment~2.
+
+The message serves two purposes. First, it keeps all later instructions within
+one project and one workspace. Second, it states explicitly that the setup
+message is not a software requirement. It is therefore excluded from the
+ground truth and candidate master prompts by design, rather than being removed
+later during consolidation.
+
+The setup message is not counted as Prompt~1. Numbering begins with the first
+actual project instruction.
+
+\begin{lstlisting}[breaklines=true, basicstyle=\small\ttfamily, caption={Pre-experiment setup prompt, sent once before Prompt 1 of every session.}, label={lst:pre-experiment}]
+The following instructions are only for setting up our conversation. They are not part of the software project's requirements and must not be included if you are later asked to summarize, consolidate, or generate a master prompt for the project.
+
+Throughout this conversation, treat every subsequent request as part of the same software project. Only work within the current project folder and do not create a new project or switch to another workspace unless I explicitly ask you to.
+
+Acknowledge these instructions and wait for the first project prompt.
+\end{lstlisting}
+
+Experiment~2 uses the same setup message before the handoff sequence. The
+fixed handoff prompt is then sent, followed by the settled master prompt $M$
+for the selected project and its later instructions. The setup message is
+administrative and is kept separate from the requirements against which the
+later prompts are checked.
+
+\section{Single-Pass Consolidation Prompts}
+\label{app:consolidation-prompts}
+
+The three single-pass strategies use cumulative instructions.
+\texttt{basic\_prompt} provides the base instruction.
+\texttt{loose\_consolidate} adds the second clause to the base instruction.
+\texttt{strict\_consolidate} uses the base instruction, the loose clause, and
+the final traceability rule together.
+
+\begin{lstlisting}[breaklines=true, basicstyle=\small\ttfamily, caption={\texttt{basic\_prompt}: base consolidation instruction.}]
+I have given you a sequence of prompts to build a project, in order. Some prompts added a new requirement, some changed an earlier requirement, and some canceled or undo an earlier requirement completely. Read them in the exact order given. Create a master prompt that consolidate all of them into one single prompt.
+\end{lstlisting}
+
+\begin{lstlisting}[breaklines=true, basicstyle=\small\ttfamily, caption={Additional clause used by \texttt{loose\_consolidate}.}]
+Make sure that if I have modified or remove a requirement, this is correctly reflected in the final single prompt. The final single prompt should have the exact same meaning of all prompts without any additional or missing features.
+\end{lstlisting}
+
+\begin{lstlisting}[breaklines=true, basicstyle=\small\ttfamily, caption={Additional traceability rule used by \texttt{strict\_consolidate}.}]
+Important rule: every requirement in the master prompt must be something I actually wrote in one of these prompts. Do not add any requirement, detail, file name, library, or design choice that I did not explicitly ask for, even if it seems like a reasonable or natural thing to include. If something is not directly traceable back to one of these numbered prompts, leave it out.
+\end{lstlisting}
+
+\section{Spec-Guided Governance Instruction for Experiment 1}
+\label{sec:governance-instruction}
+
+The fourth strategy in Experiment~1 does not create the master prompt through
+a final single-pass request. Instead, it maintains a living specification
+throughout the original project session.
+
+The governance instruction below was placed in the agent's rules file, or sent
+once before the first project prompt, and remained active for the complete
+session. The same final version was used to produce all scored
+\texttt{spec\_guided} candidates. Its development and the failure modes found
+during testing are discussed in \cref{sec:rq2-governance}.
+
+\begin{lstlisting}[breaklines=true, basicstyle=\small\ttfamily, caption={Experiment~1 \texttt{spec\_guided} governance instruction, reproduced verbatim.}, label={lst:governance}]
+This project keeps its INTENT as a living master prompt, maintained under the rules below. Two files matter:
+
+- prompts.md -- an append-only, verbatim log of every instruction I give, in order. You never edit, reorder, or delete a past entry. Keep it as a reference to check order or intent if spec.md is ever unclear -- you do not rebuild spec.md from it on every turn.
+- spec.md -- the current master prompt, as a single flowing text, written the same way you would consolidate a whole prompt history into one master prompt in a single pass. Not a tagged list of individual items. spec.md is the single source of truth for WHAT to build; all code derives from it.
+
+This governance message itself is not a numbered prompt. Do not add it to prompts.md, and do not treat any part of it as a requirement to fold into spec.md -- it is a standing rule about HOW you work, not something I am asking you to build. Prompt numbering starts at 1 with the first message I send after this one.
+
+On EVERY instruction I give you after this one, before you write or change any code, do the following in order.
+
+1. Record. Append my instruction to prompts.md verbatim, as the next numbered entry.
+
+2. Re-consolidate. Read the current spec.md in full together with my new instruction, then rewrite spec.md exactly the way you would consolidate a whole prompt history into one master prompt in a single pass:
+   - If my instruction is compatible with what's already in spec.md, integrate it.
+   - If it clearly changes or withdraws something already in spec.md, update spec.md so only the current version remains. If it withdraws something with nothing replacing it, delete that detail outright -- do not replace it with a restated explanation of the withdrawal (e.g. do not turn "remove dark theme" into "use light theme only", or "undo the sidebar" into "use no sidebar" -- nobody asked for either; the correct result is that spec.md simply says nothing about it). This holds no matter what words I used to say it ("remove", "undo", "cancel", "never mind", "go back to", or any other phrasing with the same intent -- judge by what I mean, not which word appears).
+   - If it cannot both hold with something already in spec.md, and I did not clearly signal that I am revising that detail, do not pick a side and do not merge. Leave spec.md as it was, list the conflict under a "## Unresolved conflicts" section (both sides, and the instruction each came from), and ask me to decide.
+   If you cannot tell a revision from a conflict, treat it as a conflict and ask.
+
+   Every requirement in spec.md, after this rewrite, must be something I actually wrote across prompts.md. Do not add a file name, library, framework, code, or any design or implementation choice I did not state, even if it seems reasonable. Do not reword the CONTENT of what I wrote into your own phrasing either, even to make it read more cleanly -- reuse my exact words for names, values, and conditions; a reworded restatement of content is how an unwritten detail slips in disguised as a summary, the same failure as inventing content outright. If something is not directly traceable back to what I wrote, leave it out.
+
+   Do not edit spec.md's existing sentence for a topic by splicing my new instruction's own wording into it, the way a text editor would patch a line. Instead, whenever my instruction touches a topic already covered in spec.md, gather EVERY prompt in prompts.md that has ever said something about that same topic (including this new one), and write ONE fresh sentence for that topic from that whole set -- exactly the way you would if you were consolidating only those prompts into a master prompt for the first time, in a single pass. Treat the topic's history as raw material to write from, not text to edit: the fresh sentence states only the requirement itself, in the same plain, declarative register a master prompt is written in -- whatever in the source prompts was about the conversation itself, rather than about what must be built, does not survive into a document freshly written from scratch, the same way it would never appear if you were drafting a specification from these prompts for the first time. You are recomposing from wording I actually used, not inventing anything, so this is still fidelity, not paraphrase -- but fidelity is to the CONTENT (names, values, conditions, constraints) of the topic's full history, not to reproducing any one prompt's sentence whole, including whatever in it was not content. For example, this single fresh-from-history rule is why "I'd like to build a simple ERP web application for a small business. Let's start with a clean foundation that we can gradually expand." becomes "Build a simple ERP web application for a small business with a clean foundation that can be gradually expanded.", and why "Add 3 navigation buttons: Home, Orders, Contact." plus a later "Change navigation buttons: Dashboard, Policies, History, Contact." becomes one fresh "Add 4 navigation buttons: Dashboard, Policies, History, Contact." -- the same operation both times, not two different rules. Doing this per topic, every time that topic is touched, is what keeps every turn's spec.md reading the way one whole-history consolidation would.
+   Also keep the source's own economy of language: if a sentence omits repeated words across a list of clauses, keep that same omission rather than spelling every clause out in full.
+
+3. Derive. Write or change code so it matches spec.md.
+
+When I say "consolidate", output spec.md exactly as it stands, plus "## Unresolved conflicts" if that section is non-empty. Do not re-derive it from prompts.md -- spec.md, as already maintained, is the master prompt.
+\end{lstlisting}
+
+\section{Requirement-Decomposition Prompt}
+\label{sec:decomp-prompt}
+
+The requirement-level AlignScore evaluation first separates each candidate
+master prompt into atomic requirements
+(\cref{sec:method-metrics}). This step is performed by an LLM using the fixed
+prompt below.
+
+The prompt adapts the general decomposition idea of Claimify
+\citep{metropolitansky2025claimify} to software requirements. It asks for
+independently checkable requirements rather than factual propositions and
+adds granularity rules and examples drawn from this evaluation. This thesis
+does not run the Claimify system itself.
+
+The decomposition prompt is applied once to each sentence in a candidate
+master prompt. It uses a keep-all approach: no statement is removed because
+it appears unsupported, outdated, or unnecessary. This ensures that content
+introduced by an agent remains present and can receive a low AlignScore later.
+
+The ground-truth atomic map is not produced with this prompt. It is created
+manually during ground-truth construction for the reasons explained in
+\cref{sec:method-metrics}.
+
+\begin{lstlisting}[breaklines=true, basicstyle=\small\ttfamily, caption={Requirement-decomposition prompt applied to each candidate sentence.}, label={lst:decomp-prompt}]
+You are given the prompt history as context and ONE clarified requirement sentence. Split it into the SIMPLEST self-contained atomic requirements. Each atomic requirement must be understandable in isolation and mean the same as in context.
+
+FIDELITY (highest priority -- do this before anything else):
+- REUSE THE SOURCE'S EXACT WORDS. Do NOT paraphrase, do NOT swap synonyms, do NOT drop qualifiers or adjectives. If the source says "build", write "build", not "create". If it says "the overall structure", keep "the overall structure", do not add "code".
+- The ONLY edits allowed are: (1) split into separate sentences; (2) resolve a pronoun or a back-reference ("it", "that", "do that", "them") by inserting the referent in [square brackets]; (3) add the minimum connective words, also in [square brackets], to make the unit a standalone sentence. Everything NOT in brackets must be a verbatim span of the source.
+- NEVER consult any ground truth, reference answer, or outside knowledge. Work only from the given source text. Your job is to split and lightly decontextualize, never to correct, normalize, or improve the wording.
+
+Granularity rules (follow exactly):
+- PERMISSIONS: one requirement per (role, object). "Staff can't delete customers or products" -> two requirements.
+- COMPOUND actions/side-effects: split. "When confirmed, reduce stock and generate an invoice" -> two requirements.
+- ENUMERATIONS / attribute sets stated together: keep as ONE requirement. Do NOT over-split "name, SKU, price, and stock" or "Cash and Bank Transfer" into separate requirements.
+- Keep the acting entity/context ("A sales order should...", "The dashboard should...").
+
+Output: a bullet list, one atomic requirement per line starting with "- ". Nothing else.
+
+Examples:
+Sentence: "If the label starts with H the background is blue; if it starts with O it is red; if it starts with D it is yellow."
+- A navigation label starting with H must have a blue background.
+- A navigation label starting with O must have a red background.
+- A navigation label starting with D must have a yellow background.
+
+Sentence: "Each product should have a name, SKU, price, and current stock quantity."
+- Each product must have a name, SKU, price, and current stock quantity.
+
+Sentence: "Staff members shouldn't be allowed to delete customers or products. Only Admin users can do that."
+- Staff users shouldn't be allowed to delete customers.
+- Staff users shouldn't be allowed to delete products.
+- Admin users should be able to delete customers.
+- Admin users should be able to delete products.
+\end{lstlisting}
+
+The decomposition prompt permits inserted referents and connective words to be
+marked with square brackets. However, the final atomic-requirement files used
+for scoring do not contain bracket markers. The text-cleaning stage does not
+remove them, so they would otherwise be passed directly to AlignScore. A
+paired check showed that the markers lowered the score of an otherwise
+identical claim. Where a pronoun or back-reference needed to be resolved, the
+final reviewed requirement therefore used plain, already-resolved prose,
+consistent with the style of the hand-built ground truth.
+
+\section{Prompt History: The Simple Project}
+\label{app:history-simple}
+
+The simple project contains 12 numbered prompts.
+
+\begin{lstlisting}[breaklines=true, basicstyle=\small\ttfamily]
+1. Create a portal homepage.
+2. Add 3 navigation buttons: Home, Orders, Contact.
+3. If the label of the navigation button starts with "H", the background color of the button should be blue; if the label starts with "O", the background color should be red; if the label starts with "D", the background color should be "yellow".
+4. Add dark theme.
+5. Remove dark theme.
+6. Add sidebar navigation.
+7. Undo sidebar.
+8. Use top navigation instead.
+9. Change navigation buttons: Dashboard, Policies, History, Contact.
+10. Style navigation: rounded buttons, blue accent, modern font.
+11. Add a contact form with name, email, and message fields. The email field must be validated before the form can submit.
+12. Make sure the page also works well on mobile screens.
+\end{lstlisting}
+
+\section{Prompt History: The Hard Project}
+\label{app:history-erp}
+
+The hard project contains 45 numbered prompts.
+
+\begin{lstlisting}[breaklines=true, basicstyle=\small\ttfamily]
+1. I'd like to build a simple ERP web application for a small business. Let's start with a clean foundation that we can gradually expand.
+2. The first thing we need is customer management. Users should be able to create, edit, delete, and browse customers.
+3. Now let's add products. Each product should have a name, SKU, price, and current stock quantity.
+4. We'll probably need navigation now. A sidebar on the left with Dashboard, Customers, and Products should be enough for now.
+5. The dashboard doesn't need much yet. Just show the total number of customers and products.
+6. Let's start implementing sales orders. A sales order should belong to one customer and contain one or more products with quantities.
+7. I forgot something important. The total amount should be calculated automatically from the selected products and quantities.
+8. When a sales order is confirmed, reduce the inventory automatically.
+9. Actually, don't let users confirm the order if any item doesn't have enough stock available.
+10. I showed the prototype to the client. They don't like the sidebar. Replace it with a top navigation bar instead.
+11. Now we also need purchase orders so staff can restock inventory.
+12. When a purchase order is marked as received, increase the product stock automatically.
+13. Since we're buying from suppliers, let's add vendor management too. It should work similarly to customer management with create, edit, delete, and browse operations.
+14. The client asked whether inventory could be tracked separately for multiple warehouses. Let's support multiple warehouses.
+15. Never mind. The client said that's overkill for their business. Let's go back to a single stock quantity for each product.
+16. Whenever a sales order is confirmed, automatically generate an invoice.
+17. Invoices should have a due date 30 days after they're created.
+18. Finance just asked to shorten the payment period. Make the invoice due date 15 days instead.
+19. Invoices also need a payment status. Use these three statuses: Unpaid, Partially Paid, and Paid.
+20. Users should be able to record payments against invoices.
+21. Support these payment methods: Cash, Bank Transfer, Credit Card.
+22. Scratch that. The company doesn't accept credit cards. Remove that payment option.
+23. We should probably introduce user roles now. Let's have Admin and Staff.
+24. Staff members shouldn't be allowed to delete customers or products. Only Admin users can do that.
+25. Actually, we need one more role. Add a Manager role. Managers should also be able to delete customers and products, but they shouldn't be allowed to manage user accounts.
+26. The owner wants to know which products are running low. Show low-stock products on the dashboard whenever stock drops below 10.
+27. That fixed threshold won't work for every product. Each product should have its own configurable low-stock threshold instead.
+28. Let's add a monthly sales report showing the total sales for each month.
+29. A chart would probably make the report easier to understand. Please add one.
+30. After looking at it, I think the chart is unnecessary. Let's remove it and just keep the monthly sales numbers in a table. It'll be easier to maintain.
+31. The dashboard feels a little plain. Please make it look clean and professional.
+32. Once we have a lot of data, those lists are going to get pretty long. Add pagination to all list pages, including customers, products, vendors, sales orders, purchase orders, and invoices.
+33. Searching would also be useful. Add a search bar so users can quickly find customers and products by name.
+34. One more thing. Add some basic validation. Product prices and stock quantities should never be allowed to have negative values.
+35. The codebase is getting a bit difficult to follow. Please clean up the overall structure where appropriate and add comments explaining the main business logic.
+36. The owner wants to be able to export the monthly sales report so it can be shared with their accountant. Let's add an export feature that generates a CSV file.
+37. I checked with accounting. They'd actually prefer an Excel (.xlsx) file instead of CSV.
+38. Some departments still want CSV while accounting wants Excel. Let's support both export formats.
+39. After discussing maintenance costs, we've decided to simplify things. Remove the CSV export and keep only Excel (.xlsx).
+40. The monthly sales report is becoming harder to use as more data is added. Please let users filter the report by a custom date range.
+41. There's another permission requirement. Staff members should only be able to view reports that they created themselves. Managers and Admins can continue viewing all reports.
+42. One of the users accidentally deleted several vendors yesterday. Instead of permanently deleting vendors, move them to a recycle bin so they can be restored later.
+43. After reviewing our data retention policy, only vendors should use the recycle bin. Customers and products should continue using permanent deletion based on the user's permissions.
+44. The owner asked whether we could keep a history of important business events. Please add an audit log whenever a sales order is confirmed, an invoice is generated, or a payment is recorded.
+45. The audit log should also record which user performed the action and the exact date and time it happened.
+\end{lstlisting}
+
+\section{Handoff and Later Prompts for Experiment 2}
+\label{app:conflict-prompts}
+
+After the pre-experiment setup, every run receives the same handoff prompt:
+
+\begin{lstlisting}[breaklines=true, basicstyle=\small\ttfamily,
+caption={Common handoff prompt for Experiment~2.},
+label={lst:conflict-handoff}]
+Here is the consolidated result of the earlier prompts for this project. Continue the project from here. I will then send more prompts, one at a time.
+\end{lstlisting}
+
+The hand-built ground-truth master prompt of the selected project is then
+provided as the settled master prompt $M$. The later prompts are sent one at
+a time in the order shown below.
+
+\subsection{Hard-Project Prompts}
+
+Prompts~1--4 introduce semantic conflicts, while Prompt~5 is the compatible
+positive control.
+
+\begin{lstlisting}[breaklines=true, basicstyle=\small\ttfamily]
+1. Add a reminder that gets sent 3 days before an invoice's 30-day due date.
+2. Add a recycle-bin tab on the customers page with a Restore button, the same way vendors already work.
+3. Add a button to collapse and expand the left sidebar.
+4. Add an audit entry for when a staff member deletes one of their own products.
+5. Add a print button on the invoice detail page.
+\end{lstlisting}
+
+\subsection{Simple-Project Prompts}
+
+Prompt~1 conflicts with the settled requirement that defines four navigation
+buttons. Prompt~2 is the compatible positive control.
+
+\begin{lstlisting}[breaklines=true, basicstyle=\small\ttfamily]
+1. Make sure all five navigation buttons wrap onto two rows on small screens.
+2. Add a footer at the bottom of the page showing a copyright notice.
+\end{lstlisting}
+
+\section{Spec-Guided Governance Instruction for Experiment 2}
+\label{sec:conflict-governance-instruction}
+
+The \emph{spec-guided} condition uses the separate governance instruction
+below for both project cases. Unlike the common handoff prompt, this
+instruction defines how each later prompt is checked against the settled
+master prompt $M$ and how unresolved conflicts are handled.
+
+It also differs from the Experiment~1 governance instruction in
+\cref{lst:governance}. Experiment~1 maintains \texttt{prompts.md} and
+\texttt{spec.md} from the beginning of the original project session, whereas
+Experiment~2 begins with an already-settled master prompt handed to a new
+session.
+
+\begin{lstlisting}[breaklines=true, basicstyle=\small\ttfamily, caption={Spec-guided governance instruction used in Experiment~2.}, label={lst:conflict-governance}]
+I am going to give you the consolidated result of the earlier prompts as your starting specification, then send more prompts one at a time. Build this project and implement each new prompt in code as usual -- building the app stays your main task. As each new prompt arrives, check it against everything already in the specification that describes the same thing.
+
+- If the new prompt is compatible with the specification, consolidate it in and implement it.
+- If the new prompt cannot both hold with something already settled, do not silently overwrite the earlier requirement. Whether I am deliberately revising that earlier decision, or I have simply overlooked that it was already settled, is something you often cannot tell -- so unless I clearly mean to revise that specific earlier requirement, treat the clash as an unresolved conflict: keep both, record it with the earlier requirement and the new prompt, keep the conflicting value out of the master prompt, and ask me which I want -- but keep building everything else. When in doubt, ask rather than pick.
+- Never invent a value, rule, or detail that is not written. Do not add coding conventions, file names, or any implementation choice I did not ask for.
+
+When I say "consolidate", output the specification you have maintained, in two sections: "## Master prompt" (the conflict-free requirements) and "## Unresolved conflicts" (each conflict, both sides, why). Emit the specification you have kept current; do not re-derive it from the raw prompts. Acknowledge and wait for the consolidated result.
+\end{lstlisting}

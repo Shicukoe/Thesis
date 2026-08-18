@@ -1,0 +1,230 @@
+\chapter{Related Work}
+\label{chap:related-work}
+
+Among the studies on AI-assisted development, several studies
+are relevant to the problems addressed in this thesis. This chapter
+reviews work on prompt consolidation and project handoff, errors in consolidated
+requirements, requirement traceability evaluation, methods for keeping
+specifications up to date, and semantic conflict detection. The final section
+brings these areas together and identifies the research gap addressed by this
+thesis.
+
+\section{Prompt Consolidation and Project Handoff}
+\label{sec:related-consolidating}
+
+The work most directly related to prompt consolidation is presented by
+\citet{mondal2024consolidating}. The study shows how users solve an issue through
+sequences of prompts and propose combining those prompts into a single prompt.
+Their main goal is to reduce repeated interaction and produce the desired
+answer more efficiently. They do not study about whether every statement in the
+consolidated prompt can be traced to the original prompt sequence. They also
+do not examine how later prompts remove, undo, or replace earlier
+requirements.
+
+Recent work has also studied how an AI coding task can be continued after a
+handoff. \citet{kc2026handoffdebt} describe \emph{handoff debt}: the work a
+new coding agent must repeat to understand an interrupted task. Their focus is
+on transferring repository state and task information so that another agent
+can resume the work. This differs from the present thesis, which studies how
+faithfully the current project intent can be represented in one master
+prompt.
+
+Another approach is to preserve the interaction history rather than
+consolidate it. \citet{santoni2026cmv} propose a graph-based memory system that
+keeps previous interaction turns available for later retrieval. This avoids
+reducing the full history to one document. The present research studies a
+different case: the history is deliberately turned into a single portable
+artifact that can be read, stored, and handed over.
+
+\section{Errors in Consolidated Requirements}
+\label{sec:related-loss}
+
+The main failure studied in this thesis is that a generated master prompt may
+contain requirements that are not supported by the user's prompt history.
+This can be understood through existing work on hallucination.
+
+\citet{ji2023survey} distinguish between intrinsic and extrinsic
+hallucination. Intrinsic hallucination occurs when generated content
+contradicts its source. Extrinsic hallucination occurs when generated content
+cannot be supported by the source. This, by definition, is relevant to master-prompt
+consolidation. A technology, filename, validation rule, or design choice that
+the user never requested is unsupported requirements and is therefore close to
+extrinsic hallucination. 
+
+A different error occurs when the master prompt retains an old requirement
+after a later prompt has changed, removed, or replaced it. This content
+originally appeared in the prompt history, so it is not unsupported in the
+same way as extrinsic hallucination. Instead, it reflects a failure to 
+follow the order of user's prompts and recover the user's current intent.
+
+Related work has also used language models to obtain software requirements
+from conversations. \citet{voria2025recover} propose RECOVER, which finds
+and generates system requirements from stakeholder conversations. This shows
+that unstructured dialogue can be used as a source of requirements. However,
+RECOVER focuses on generating requirements from stakeholder discussions. Unlike 
+the problem addressed by \citet{voria2025recover}, the prompt history already
+contains direct development instructions, but their current state must be 
+recovered after modifications, removals, replacements, and changes of direction.
+
+\section{Evaluating Requirement Traceability}
+\label{sec:related-metrics}
+
+Word similarity alone is not reliable enough for evaluating a master prompt. Two
+requirements may use almost the same words while conflicting with each other in meaning.
+In contrast, two requirements can use different words while expressing the same
+requirement. For this reason, this study uses entailment-based evaluation to check whether the meaning of a candidate requirement is supported by the ground truth.
+
+\citet{zha2023alignscore} propose AlignScore, a factual-consistency metric that
+measures whether a claim is supported by a context. The model treats the two
+inputs differently: one is the source context and the other is the claim being
+checked. In this thesis, the manually constructed ground truth is used as the
+context and each candidate requirement is used as the claim:
+
+\[
+\mathrm{ALIGN}
+(\mathrm{context}=\mathrm{ground\ truth},\
+\mathrm{claim}=\mathrm{candidate\ requirement}).
+\]
+
+A low score means that the candidate requirement is not well supported by the
+ground truth. This makes AlignScore suitable for finding agent-added details
+and outdated requirements.
+
+The evaluation is performed at the requirement level rather than on the full
+master prompt. This choice is related to FActScore and Claimify.
+\citet{min2023factscore} evaluate long-form text by first separating it into
+atomic facts and then checking whether each fact is supported.
+\citet{metropolitansky2025claimify} study how complex text can be separated
+into clear and independent claims. This thesis uses the same
+general idea but treats each unit as an atomic software requirement.
+
+This requirement-level evaluation gives each requirement its own score, making it
+possible to identify exactly which parts of a master prompt are unsupported.
+It also prevents well-supported requirements from hiding a small number of
+incorrect ones. The scores from individual requirements
+can then be used to calculate the untraceable rate and to support 
+human review of the errors found in each candidate.
+
+Traceability has also been studied between other software artifacts.
+\citet{alor2025traceability} evaluate whether language models can create trace
+links between software documentation and source code. Their artifacts and
+evaluation setting are different from those in this thesis, but there is 
+common concern about whether one artifact is supported by another.
+However, in this thesis, each generated requirement is checked against
+the ground-truth master prompt to determine whether 
+it is supported by the user's original requirements.
+
+\section{Keeping an Up-to-Date Specification}
+\label{sec:related-spec}
+
+Spec-driven development provides a related view of how natural language
+requirements can be used during AI-assisted development. \citet{piskala2026specdriven} describe approaches in which a specification is
+kept as the main description of what the software should do, while code is
+generated or checked against it.
+
+The \texttt{spec\_guided} method in this thesis uses a similar principle.
+Instead of asking an agent to rebuild the current requirements from the full
+prompt history only at the end, it keeps a specification updated throughout
+the session. The specification records the requirements that are currently
+valid, while the original prompts are kept separately as their source.
+
+This thesis does not treat the specification as a complete replacement for
+code, nor does it claim to implement a full spec-driven development system.
+It uses the maintained-specification idea for a narrower purpose: reducing
+non-traceable content during master-prompt construction and giving the agent
+a current document against which later instructions can be checked.
+
+Prompts can also become maintained artifacts in software projects.
+\citet{tafreshipour2025wild} study how prompts stored in software repositories
+change over time and report inconsistencies between prompt revisions. Their
+work examines repository-based prompts rather than the developer--agent prompt
+histories studied in this thesis. However, it supports the view that prompts
+may need to be stored and maintained carefully when they remain part of a
+project over time.
+
+\section{Semantic Conflict Detection}
+\label{sec:related-vc}
+
+A text document can merge successfully while still containing requirements
+that conflict in meaning. Such a conflict is called a semantic conflict.
+Related work in collaborative code generation shows the same difference 
+between text-level consistency and semantic correctness.
+
+\citet{pugachev2025codecrdt} propose CodeCRDT, which allows multiple coding
+agents to edit shared code while avoiding text-level merge conflicts.
+Their preliminary inspection suggests that 5--10\% of the inspected runs
+still contain semantic problems such as duplicate declarations and type
+mismatches. This result is not a complete measurement of semantic-conflict
+frequency, but it shows an important point: a clean text-level merge
+does not guarantee a correct result.
+
+CodeCRDT studies conflicts in source code. Unlike source code, it cannot be checked by a compiler, type checker, or test suite, and there is no exact score that can always determine whether two requirements conflict. The conflict must therefore be identified by comparing their meanings. Thus, this thesis shows that the conflict must be found 
+by comparing the meaning of the incoming instruction with the meaning of 
+the existing specification.
+
+The work most closely related to the conflict part of this thesis is
+\emph{Semantic Commit} by \citet{vaithilingam2025semanticcommit}. Their system
+helps users add new information to an existing intent specification, such as a
+Cursor rules file or game design document. It uses a knowledge graph and
+retrieval to find existing information that may be affected by the update.
+The retrieved information is then classified as a direct conflict, an
+ambiguous conflict, or a non-conflict. The interface presents the result to
+the user and supports human review and resolution.
+
+Semantic Commit also evaluates a baseline called DropAllDocs, which provides
+the complete existing information store to the model instead of retrieving
+selected parts. The present thesis uses a related full-context idea because
+the tested master prompts are small enough to fit in the model context.
+However, it does not reproduce Semantic Commit's knowledge-graph retrieval
+pipeline or its user interface.
+
+The main difference is the starting point. Semantic Commit assumes that an
+intent specification already exists and studies how new information should be
+added to it. This thesis first studies whether such a specification can be
+constructed faithfully from a long prompt history. It then reuses the
+maintained specification to check next instructions for conflict. In other
+words, Semantic Commit mainly addresses updates to an existing intent
+specification. It does not study how that specification was created from
+the earlier development history, while RQ1 and RQ2 examine how a traceable master prompt is
+created before updating the specification.
+
+The decision not to resolve a conflict automatically is also related to the
+intent gap described by \citet{lahiri2026intent}. A model may produce an
+implementation that appears reasonable while still differing from what the
+user intended. When two requirements cannot both be true and the user's
+preferred value is not clear, silently selecting one value may create the
+same problem. The safer action is to report the conflict and ask the user to
+decide.
+
+\section{Research Gap}
+\label{sec:positioning}
+
+The reviewed work can be compared along three parts of the problem: producing
+one consolidated artifact, checking whether its content is supported by the
+source prompts, and reporting semantic conflicts when the artifact is updated.
+
+Prompt consolidation by \citet{mondal2024consolidating} addresses the first
+part, but its purpose is interaction efficiency rather than requirement
+traceability. AlignScore \citep{zha2023alignscore}, FActScore
+\citep{min2023factscore}, and Claimify \citep{metropolitansky2025claimify}
+provide useful ideas for evaluating support at a fine level, but they do not
+construct or maintain a master prompt. Spec-driven development
+\citep{piskala2026specdriven} supports the use of a maintained specification,
+but does not directly evaluate whether an AI-generated master prompt contains
+requirements that the user never requested. CodeCRDT
+\citep{pugachev2025codecrdt} shows that text-level convergence does not
+prevent semantic errors, but it works on source code rather than
+natural-language requirements.
+
+Semantic Commit \citep{vaithilingam2025semanticcommit} is the closest work for
+conflict detection because it checks new information against an existing
+intent artifact and keeps the user involved in resolution. However, it begins
+with an intent specification that has already been prepared. It does not
+study whether consolidating a raw, ordered prompt history introduces
+unsupported requirements or retains values that were later changed.
+
+Among the works reviewed in this chapter, the specific combination studied in
+this thesis remains open: evaluating the traceability of a master prompt built
+from a chronological AI coding history, comparing single-pass consolidation
+with a maintained-specification method, and testing whether the same method
+can report later semantic conflicts without silently resolving them.

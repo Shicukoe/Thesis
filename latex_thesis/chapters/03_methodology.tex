@@ -1,0 +1,280 @@
+\chapter{Methodology}
+\label{chap:methodology}
+
+This chapter describes the two experiments conducted in this thesis. It first
+summarizes their design (\cref{sec:method-overview}), then presents the
+datasets and ground truths used in Experiment~1 (\cref{sec:method-dataset}),
+the consolidation pipeline used in Experiment~1 (\cref{sec:method-pipeline}), and the
+traceability evaluation used for RQ1 and RQ2
+(\cref{sec:method-metrics}). Finally, the full design of Experiment~2, which
+addresses semantic conflict handling in RQ3, is presented separately in
+\cref{chap:experiment-conflict}.
+
+\section{Overview of the Experiments}
+\label{sec:method-overview}
+
+This thesis contains two experiments:
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Experiment~1: Traceability Evaluation (RQ1 and RQ2).}
+  This experiment uses two project histories, three AI coding agents, and four
+  consolidation strategies. RQ1 compares the three single-pass strategies:
+  \emph{basic}, \emph{loose}, and \emph{strict}. RQ2 evaluates the proposed
+  \emph{spec-guided} strategy against these baselines. Together, the four
+  strategies produce 24 master-prompt candidates, which are evaluated using
+  mean AlignScore and untraceable rate.
+  \item \textbf{Experiment~2: Semantic Conflict Handling (RQ3).}
+  This experiment begins with the hand-built ground-truth master prompt of each
+  project as a settled specification. The simple project receives one
+  conflicting instruction and one compatible control, while the hard project
+  receives four conflicting instructions and one compatible control. Claude,
+  Codex, and Gemini are tested under three conditions:
+  \emph{consolidate-then-ask}, \emph{do-not-resolve}, and
+  \emph{spec-guided}. The experiment examines how each condition represents
+  semantic conflicts without automatically selecting between incompatible
+  requirements.
+\end{itemize}
+
+The following sections describe the dataset, consolidation pipeline, and
+traceability evaluation used in Experiment~1. The complete design and evaluation criteria
+of Experiment~2 are presented in
+\cref{chap:experiment-conflict}.
+
+\section{Dataset and Ground Truth}
+\label{sec:method-dataset}
+
+Two synthetic project histories were created for controlled evaluation,
+summarized in \cref{tab:dataset-overview}. They are different in length, complexity,
+and writing style.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Overview of the two evaluation projects.}
+  \label{tab:dataset-overview}
+  \begin{tabular}{@{}llp{9.7cm}@{}}
+    \toprule
+    Project & Prompts & Description \\
+    \midrule
+    simple project & 12 & A small portal project with navigation
+      requirements, a conditional color rule, a contact form, and several
+      later navigation changes. \\
+    hard project & 45 & A larger ERP-style application with customers,
+      vendors, products, orders, invoices, reports, roles, and permissions.
+      Its history contains more revisions, removals, and conversational
+      wording. \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+A ground-truth master prompt was constructed manually for each project. The
+prompts were read in their original order, and only the requirements that
+remained valid at the end of the history were retained. A later modification
+replaced the earlier value, while a removal or undo instruction deleted the
+affected requirement when no replacement was given. Details that did not
+originate from the user's prompts were excluded.
+
+The ground truth was also split manually into atomic requirements. Then, when the
+LLM split the candidate master prompts, these ground-truth requirements
+were used to check whether a candidate unit combined too many requirements or
+split one requirement into unnecessarily small parts.
+
+Every Experiment~1 candidate is evaluated against the ground truth for the
+same project. Both ground-truth master prompts are also used as settled
+starting artifacts in Experiment~2. The simple-project case introduces one
+conflict and one compatible control, while the hard-project case introduces
+four conflicts and one compatible control.
+
+\section{Consolidation Pipeline}
+\label{sec:method-pipeline}
+
+Each project history was replayed with three AI coding agents:
+
+\begin{itemize}[leftmargin=*]
+  \item Claude, using Claude Sonnet 4.6;
+  \item Codex, using GPT-5.5-Codex;
+  \item Gemini, using Gemini Flash 3.5.
+\end{itemize}
+
+Separate sessions were used for each agent, project, and strategy. The project
+prompts were delivered in their original order.
+
+Before Prompt~1, every session received the same fixed setup message
+(\cref{sec:pre-experiment}). It instructed the agent to treat all next
+requests as part of one project and to remain in the same workspace. It also
+stated that the setup message was not a software requirement and must not
+appear in the master prompt.
+
+\subsection{Consolidation Strategies}
+
+Experiment~1 compares four strategies, summarized in
+\cref{tab:consolidation-variants}.
+
+\begin{table}[htbp]
+  \centering
+  \caption{The four consolidation strategies used in Experiment~1.}
+  \label{tab:consolidation-variants}
+  \begin{tabular}{@{}lp{9.5cm}@{}}
+    \toprule
+    Strategy & Description \\
+    \midrule
+    \texttt{basic\_prompt} & The agent is asked to consolidate the ordered
+      prompt history into one master prompt. No explicit traceability rule is
+      provided. \\
+    \texttt{loose\_consolidate} & The basic instruction is extended by asking
+      the agent to reflect later modifications and removals and to avoid
+      additional or missing features. \\
+    \texttt{strict\_consolidate} & The loose instruction is extended with an
+      explicit traceability rule: every requirement must originate from the
+      numbered prompts, and unrequested or non-traceable details must be excluded. \\
+    \texttt{spec\_guided} & The agent records the raw prompts in
+      \texttt{prompts.md} and maintains the current master prompt in
+      \texttt{spec.md} after every new instruction. \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The first three strategies are single-pass approaches. The agent receives the
+complete history and creates the master prompt once, at the end. Their
+instructions are cumulative: \texttt{loose\_consolidate} adds a faithfulness
+clause to \texttt{basic\_prompt}, and \texttt{strict\_consolidate} adds an
+explicit traceability rule. The exact templates are reproduced in
+\cref{app:consolidation-prompts}.
+
+The fourth strategy, \texttt{spec\_guided}, maintains the master prompt
+throughout the session under a standing governance instruction. It uses two
+files:
+
+\begin{itemize}[leftmargin=*]
+  \item \texttt{prompts.md}, an append-only, verbatim log of the numbered
+  project prompts;
+  \item \texttt{spec.md}, the current master prompt containing only the
+  requirements that remain valid.
+\end{itemize}
+
+After each new prompt, the agent records it in \texttt{prompts.md} and updates
+\texttt{spec.md}. Compatible requirements are added, while clear
+modifications, replacements, removals, and undo instructions update the
+affected topic immediately.
+
+When a prompt changes an existing topic, the agent reconstructs that topic
+from its relevant prompt history instead of editing the current sentence
+locally. This helps remove outdated values and conversation-dependent wording.
+The development of this rule is described in
+\cref{sec:rq2-governance}.
+
+If a new instruction cannot hold together with a settled requirement and does
+not clearly indicate a deliberate revision, the agent leaves the current
+specification unchanged and records the conflict for the user to decide. The
+same conflict-handling principle is applied in Experiment~2 through a
+separate governance instruction written for the project-handoff setting.
+
+At the end of the session, \texttt{spec.md} itself is used as the candidate
+master prompt. The full governance instruction is reproduced in
+\cref{lst:governance}.
+
+This method borrows the general spec-driven development principle that the
+specification can act as the main statement of what should be built
+\citep{piskala2026specdriven}. It does not implement a complete spec-driven
+development toolchain; \texttt{spec.md} is used here only to maintain a
+traceable master prompt.
+
+\section{Traceability Metrics}
+\label{sec:method-metrics}
+
+Experiment~1 evaluates whether the requirements stated in each candidate are
+supported by the ground truth. The evaluation focuses on content that appears
+in the candidate but is not part of the final user intent, including
+agent-added details and outdated requirements.
+
+\subsection{Atomic Requirement Decomposition}
+
+A whole-document score can hide a small number of unsupported requirements
+among many correct ones. Each candidate is therefore evaluated one atomic
+requirement at a time.
+
+The decomposition follows the general idea of Claimify
+\citep{metropolitansky2025claimify}, but this thesis does not run the Claimify
+system. Instead, a fixed prompt designed for software requirements is applied
+to each candidate sentence using an LLM
+(\cref{sec:decomp-prompt}).
+
+The prompt uses a keep-all approach. It retains unsupported details,
+outdated requirements, conversational statements, and any other content in
+the candidate so that these units remain available for scoring.
+
+The ground truth and candidates are decomposed differently:
+
+\begin{itemize}[leftmargin=*]
+  \item the ground-truth atomic requirements are created manually during
+  ground-truth construction;
+  \item candidate requirements are first generated by the fixed LLM
+  decomposition prompt.
+\end{itemize}
+
+The candidate requirements were first split by an LLM using the fixed
+decomposition prompt. The LLM did not receive the complete ground-truth master
+prompt or its list of atomic requirements for the candidate.
+However, the few-shot examples in the prompt followed the same splitting
+decisions used when creating the ground truth.
+
+After the LLM produced the candidate requirements, the author compared them
+with the manually split ground truth to check that both were divided at a
+similar level of detail. If one candidate unit combined two or more requirements 
+that were separate in the ground truth, it was divided into smaller units. 
+If the LLM split one requirement into unnecessarily small parts, those parts were kept
+together. This review changed only how the candidate text was divided; it did
+not remove, rewrite, or correct its content.
+
+The ground truth itself was split manually because the decomposition prompt
+sometimes divided one enumeration into several weaker requirements. For
+example, a requirement defining four navigation buttons could become four
+separate requirements, losing the meaning that the four buttons together form
+one complete set.
+
+Both the ground-truth construction and the candidate-decomposition review were
+performed by the same author. The possible influence of this process on the
+evaluation is discussed in \cref{sec:discussion-limitations}.
+
+
+\subsection{AlignScore}
+
+AlignScore measures whether a candidate requirement is supported by the
+ground truth \citep{zha2023alignscore}:
+
+\[
+\mathrm{ALIGN}(\text{context}, \text{claim}) \rightarrow [0,1].
+\]
+
+For each atomic candidate requirement $r$, the complete ground-truth master
+prompt is used as the context:
+
+\[
+\mathrm{AlignScore}(r) = \mathrm{ALIGN}(\text{context}=\text{ground truth},\ \text{claim}=r).
+\]
+
+The scores are computed in \texttt{nli\_sp} mode using the AlignScore-large
+checkpoint with a RoBERTa-large backbone. The comparison in
+\cref{sec:demo-experiment} explains why entailment is used instead of word or
+embedding similarity.
+
+Two values are reported for each candidate:
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Mean AlignScore}: the average score across its atomic
+  requirements;
+  \item \textbf{Untraceable rate}: the percentage of requirements with an
+  AlignScore below $0.5$.
+\end{itemize}
+
+The untraceable rate indicates how many candidate requirements are not strongly
+supported by the ground truth and therefore require further inspection. A
+requirement below the threshold is treated as potentially untraceable, not
+automatically as invented. As shown in \cref{sec:rq2-results}, some faithful
+short requirements also receive unexpectedly low scores.
+
+This is a precision-style evaluation because it checks only the content
+included in the candidate. It does not measure whether the candidate omitted
+a valid ground-truth requirement. Ground-truth coverage is therefore left as
+a limitation (\cref{sec:discussion-limitations}).
+
+

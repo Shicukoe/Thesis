@@ -22,19 +22,19 @@ plays support (and doubles as the counter-example that justifies AlignScore).
 
 Three hand-picked pairs, scored by both metrics:
 
-| pair | BERT P | BERT R | Align P (GT→cand) | Align R (cand→GT) |
-|---|---|---|---|---|
-| weather (paraphrase) | 0.875 | 0.755 | 0.958 | 0.990 |
-| **blue vs red (CONTRADICTION)** | **0.977** | **0.977** | **0.0003** | **0.0003** |
-| customer mgmt (real paraphrase) | 0.634 | 0.679 | 0.855 | 0.908 |
+| pair | BERTScore precision | AlignScore (GT→cand) |
+|---|---|---|
+| weather (paraphrase) | 0.87 | 0.84 |
+| **blue vs red (CONTRADICTION)** | **0.98** | **0.0002** |
+| customer mgmt (real paraphrase) | 0.63 | 0.87 |
 
-- **BERTScore is fooled by the contradiction** (0.977 — nearly every word matches,
-  only "blue"→"red" changed) and **penalises the honest paraphrase** (0.63/0.68 —
+- **BERTScore is fooled by the contradiction** (0.98 — nearly every word matches,
+  only "blue"→"red" changed) and **penalises the honest paraphrase** (0.63 —
   the wording was restructured). Its ranking is *backwards* for faithfulness.
 - **AlignScore is correct in both**: the contradiction collapses to ~0, the honest
-  paraphrase stays high (~0.86–0.91). It scores *support*, not surface form.
+  paraphrase stays high (0.87). It scores *support*, not surface form.
 
-Regenerate: `demo_two_examples.py` (BERTScore) and `demo_alignscore.py` (AlignScore).
+Regenerate: `demo_two_examples.py` (BERTScore) and `demo_align3_large.py` (AlignScore-large).
 
 ---
 
@@ -85,16 +85,19 @@ what "looks alike" means. We reuse their released checkpoint — we do **not** r
 Output is in **[0, 1]** (raw — not baseline-rescaled like BERTScore, so read it as
 a ranking / support probability, not a "% identical").
 
-### Directionality → precision and recall
+### One direction only (single score)
 
-Because it is directional, each candidate is scored **twice**:
+`ALIGN(context, claim)` is directional, but this thesis reports **one** score per
+candidate, in the metric's canonical direction:
 
-- **precision / traceability** = `ALIGN(context = ground-truth, claim = candidate)`
+- **AlignScore** = `ALIGN(context = ground-truth, claim = candidate)`
   → low means the candidate says things the GT does **not** support → *fabricated /
   non-traceable content* (the core RQ).
-- **recall / coverage** = `ALIGN(context = candidate, claim = ground-truth)`
-  → low means a GT requirement is **not** supported by the candidate → *dropped
-  requirement*.
+
+The reverse direction (coverage → dropped requirements) is **not** reported
+automatically; dropped requirements are caught in the manual traceability pass.
+BERTScore is likewise reported as **precision only** (share of the candidate
+anchored in the GT), the same faithfulness axis as AlignScore.
 
 ## Why RoBERTa for AlignScore but DeBERTa for BERTScore
 
@@ -115,9 +118,9 @@ In short: **DeBERTa powers the *similarity* axis (frozen embeddings), RoBERTa po
 the *support* axis (learned alignment).** Each backbone is the right tool for its
 own metric, and mixing them up would be a category error.
 
-We use **AlignScore-base** (RoBERTa-base) rather than -large purely to save disk;
-`nli_sp` on base is already strong on short requirement units. Upgrade to -large if
-scores look noisy.
+We use **AlignScore-large** (RoBERTa-large) — the strongest released checkpoint per
+the AlignScore paper. `run_align.py --size base` is still available (RoBERTa-base,
+faster, was the original disk-saving default) if you need a quick/cheap re-check.
 
 ---
 
@@ -143,7 +146,8 @@ transformers 4.30) that conflict with BERTScore's modern stack:
 | `.venv-align/` | 3.10 | AlignScore (`alignscore`, torch 1.12.1 CPU) | `.models/hf` on D |
 
 All AlignScore artifacts live under `.models/` on D: the repo clone, the
-`AlignScore-base.ckpt` (~1.9 GB), the HF cache, and the pip/tmp caches. Set the
+`AlignScore-large.ckpt` (~4.6 GB, used by default) and optionally `AlignScore-base.ckpt`
+(~1.9 GB, `--size base`), the HF cache, and the pip/tmp caches. Set the
 redirect env vars before running anything in the align venv:
 
 ```bash
@@ -170,20 +174,22 @@ git clone --depth 1 https://github.com/yuh-zha/AlignScore.git .models/AlignScore
 .venv-align/Scripts/python.exe -m pip install "transformers==4.30.2"   # downgrade for torch 1.12 compat
 .venv-align/Scripts/python.exe -m spacy download en_core_web_sm
 .venv-align/Scripts/python.exe -c "import nltk; nltk.download('punkt_tab'); nltk.download('punkt')"
-# checkpoint -> D:
+# checkpoint -> D: (large is the one actually used by default; base is optional)
+curl -L -o .models/AlignScore-large.ckpt https://huggingface.co/yzha/AlignScore/resolve/main/AlignScore-large.ckpt
 curl -L -o .models/AlignScore-base.ckpt https://huggingface.co/yzha/AlignScore/resolve/main/AlignScore-base.ckpt
 ```
 
 ## Run
 
 ```bash
-# BERTScore (venv 3.13)
-PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe src/demo_two_examples.py   # 3-pair sanity demo
-.venv/Scripts/python.exe src/run.py                                        # full dataset -> CSV + summary
+# BERTScore foil (venv 3.13)
+PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe src/demo_two_examples.py   # 2-pair BERTScore sanity demo
 
 # AlignScore (venv 3.10, D caches)
 HF_HOME=.../.models/hf TMPDIR=.../.models/tmp \
-  .venv-align/Scripts/python.exe src/demo_alignscore.py                    # 3-pair, both directions
+  .venv-align/Scripts/python.exe src/demo_align3_large.py                  # 3-pair demo (tab:demo-pairs)
+HF_HOME=.../.models/hf TMPDIR=.../.models/tmp \
+  .venv-align/Scripts/python.exe src/score_requirements.py <project> data/<project>/candidates_atomic/<Agent>__<type>.md   # requirement-level AlignScore (MAIN)
 ```
 
 Score one BERTScore pair ad hoc:
@@ -207,14 +213,15 @@ data/<project>/
 Evaluation/
   README.md  METRICS_JUSTIFICATION.md  EXPERT_BRIEF.md  requirements.txt
   src/
-    common.py             # paths, IO, text cleaning, split_requirements
-    textual_fidelity.py   # BERTScore P/R/F1 + requirement_prf; CLI
-    requirement_level.py  # requirement-level BERTScore CLI / demo
-    demo_two_examples.py  # 3-pair BERTScore sanity demo
-    demo_alignscore.py    # 3-pair AlignScore demo (both directions)
-    run.py                # scores every candidate -> CSV + summary.md
-  data/<project>/{ground_truth.md, candidates/*.md}
-  outputs/                # CSVs, summary.md, demo_*.md
+    common.py             # paths, IO, text cleaning, split_requirements, load_atomic_requirements
+    decompose_prompts.py  # Claimify decomposition (candidate/gold modes)
+    score_requirements.py # requirement-level AlignScore (each candidate requirement vs whole GT) -- MAIN
+    run_align.py          # AlignScore: single (document-level) score per candidate
+    textual_fidelity.py   # BERTScore (precision) -- foil only
+    demo_two_examples.py  # 2-pair BERTScore sanity demo (foil)
+    demo_align3_large.py  # 3-pair AlignScore-large demo (tab:demo-pairs)
+  data/<project>/{ground_truth.md, candidates/*.md, candidates_atomic/*.md}
+  outputs/                # requirement-level result .txt, demo_*.md
   .venv/ .venv-align/     # the two environments
   .models/                # AlignScore repo, checkpoint, HF/pip/tmp caches (all on D)
 ```
@@ -223,7 +230,8 @@ Evaluation/
 
 - `ground_truth.md` files are **drafts** — confirm each matches the intent fed to
   the agents before trusting numbers (see `EXPERT_BRIEF.md` for the expert flow).
-- AlignScore is directional → always run **both** directions; do not average one
-  direction and call it F1.
+- AlignScore is reported as a **single** score, `ALIGN(context=GT, claim=candidate)`;
+  the reverse direction is not reported (dropped requirements are caught in the
+  manual pass). BERTScore is reported as **precision** only, the same faithfulness axis.
 - Both models were validated on sentence/short-text and NLG-faithfulness data, not
   requirement text — a domain shift to disclose in Limitations.

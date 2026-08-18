@@ -1,0 +1,16 @@
+{
+  "history_file": "simple_portal_conflict_history.md",
+  "note": "Two-phase handoff (mirrors hard_erp). M is the hand-built ground-truth master prompt (../simple_portal/ground_truth.md), which settles four navigation buttons. The conflict is a later prompt (14) that presupposes a value incompatible with the settled four, with no explicit revision. Prompt 15 is a separate, compatible new feature (a footer) — a positive control that must be folded in, not flagged, and that does NOT touch the button count, so it does not resolve the prompt-14 conflict (the conflict stays visible during the run). Provenance is the source PROMPT number. Resolved build edit chains (dark theme, sidebar) belong to RQ1/RQ2, not here.",
+  "conflicts": [
+    {
+      "id": "SC1_button_count",
+      "type": "presupposition_value",
+      "settled": {"prompt": 10, "text": "The navigation has exactly four buttons: Dashboard, Policies, History, Contact."},
+      "conflicting": {"prompt": 14, "text": "Make sure all five navigation buttons wrap onto two rows on small screens."},
+      "reason": "The wrapping rule presupposes five navigation buttons; the navigation is settled at four (prompt 10). It cannot be built without the button count being five, which contradicts four, and no change wording is used."
+    }
+  ],
+  "compatible_additions": [
+    {"id": "P1_footer_copyright", "prompt": 15, "text": "Add a footer at the bottom of the page showing a copyright notice.", "why_not_conflict": "A genuinely new, standalone feature that contradicts nothing in M and does not concern the navigation button count, so it does not resolve the prompt-14 conflict. Positive control: must be folded in and must NOT be flagged."}
+  ]
+}

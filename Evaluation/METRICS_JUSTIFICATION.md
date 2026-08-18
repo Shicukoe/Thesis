@@ -16,15 +16,18 @@ question is not "does it read similarly" but **"is every requirement faithfully
 preserved and traceable"** — did the consolidation *drop*, *fabricate*, or silently
 *contradict* a requirement.
 
-Two failure modes, split by precision vs recall:
+The automatic metrics report **one** faithfulness axis — is the candidate's
+content supported by the reference:
 
-| Failure mode (thesis language) | Detected by | Direction |
+| Failure mode (thesis language) | Detected by | How |
 |---|---|---|
-| Agent **injects** content the reference does not support (non-traceable / Implementation Bias) | **Precision ↓** | over-inclusion |
-| Agent **drops** content the reference kept (loses requirements) | **Recall ↓** | under-inclusion |
+| Agent **injects** content the reference does not support (non-traceable / Implementation Bias) | **AlignScore ↓** (and BERTScore precision ↓) | automatic |
+| Agent **drops** content the reference kept (loses requirements) | manual traceability pass | inspect which GT requirements are absent |
 
-We report P and R separately and never collapse to F1 alone: F1 says *how much* is
-wrong, P vs R says *what kind* — and "what kind" is RQ1.
+Both automatic metrics measure only the injection axis
+(`ALIGN(context=GT, claim=candidate)` / BERTScore precision). Dropped
+requirements are caught by hand in the manual pass, not by a reverse-direction
+score. No F1 is reported.
 
 ---
 
@@ -83,18 +86,18 @@ right frozen encoder for a *similarity* read. Scores are **baseline-rescaled**
 DeBERTa caps at **512 tokens**. Our master prompts are long (up to **1417** tokens),
 multi-requirement, with irregular line breaks. Feeding a whole long prompt to
 BERTScore **truncates** it — content past 512 tokens is silently dropped, so the
-score becomes unreliable (8 of 18 candidates truncate; see `outputs/combined.md`).
+score becomes unreliable (8 of 18 candidates truncate at the document level).
 BERTScore is also a *pure similarity* metric, which is the deeper problem:
 
 > **BERTScore cannot tell a paraphrase from a contradiction.**
 
 Demonstrated on three pairs (`outputs/demo_two_examples.md`):
 
-| pair | BERTScore F1 | should be |
+| pair | BERTScore precision | should be |
 |---|---|---|
-| "cold" vs "freezing" (paraphrase) | 0.81 | high ✓ |
+| "cold" vs "freezing" (paraphrase) | 0.87 | high ✓ |
 | "H → **blue**" vs "H → **red**" (contradiction) | **0.98** | low ✗ |
-| customer mgmt reworded (real paraphrase) | 0.66 | high (under-scored) |
+| customer mgmt reworded (real paraphrase) | 0.63 | high (under-scored) |
 
 The contradiction scores **higher** than the honest paraphrase — cosine similarity
 sees "same sentence, one word different". This is why BERTScore is kept only as a
@@ -134,14 +137,16 @@ $$
 
 Output ∈ [0,1] (raw, not baseline-rescaled → read as a ranking / support strength).
 
-### 3.3 Directional → precision and recall
+### 3.3 One direction only (single score)
 
-Because it is directional, each candidate is scored **twice** (`run_align.py`):
+`ALIGN(context, claim)` is directional, but we report a **single** score per
+candidate (`run_align.py`), in the canonical direction:
 
-- **precision / traceability** = `ALIGN(context = ground-truth, claim = candidate)`
+- **AlignScore** = `ALIGN(context = ground-truth, claim = candidate)`
   → low = candidate content **not supported by** GT = *fabricated / non-traceable* (RQ1).
-- **recall / coverage** = `ALIGN(context = candidate, claim = ground-truth)`
-  → low = GT content **not supported by** candidate = *dropped requirement*.
+
+The reverse direction (coverage → dropped requirements) is not reported
+automatically; dropped requirements are caught in the manual traceability pass.
 
 ### 3.4 Why RoBERTa here, DeBERTa there
 
@@ -153,13 +158,14 @@ RoBERTa. Swapping the backbone would mean retraining the whole alignment functio
 
 ### 3.5 Why it is correct where BERTScore fails
 
-Same three pairs, now AlignScore (`outputs/demo_alignscore.md`):
+Same three pairs, now AlignScore-large (`src/demo_align3_large.py`; prints to stdout,
+no persisted output file):
 
-| pair | Align P | Align R | BERTScore F1 |
-|---|---|---|---|
-| paraphrase (weather) | 0.96 | 0.99 | 0.81 |
-| **contradiction (blue/red)** | **0.0003** | **0.0003** | 0.98 |
-| real paraphrase (customer) | 0.86 | 0.91 | 0.66 |
+| pair | AlignScore | BERTScore precision |
+|---|---|---|
+| paraphrase (weather) | 0.84 | 0.87 |
+| **contradiction (blue/red)** | **0.0002** | **0.98** |
+| real paraphrase (customer) | 0.87 | 0.63 |
 
 AlignScore collapses the contradiction to ~0 (catches what BERTScore missed) and
 keeps the honest paraphrase high (does **not** punish rewording). Its ranking is the
@@ -193,22 +199,20 @@ each requirement, no more, no less.
 
 ---
 
-## 5. Reading the current results (`outputs/combined.md`)
+## 5. Reading the current results (requirement-level AlignScore)
 
-- **Consolidation raises traceability** (Align precision), every agent: e.g.
-  simple_portal Claude **0.12 → 0.97**, Gemini **0.12 → 0.87** (basic → strict).
-- **Precision/recall trade-off** between loose and strict: strict compresses, so it
-  gains precision and gives up a little recall (Claude simple: loose 0.51/0.97 →
-  strict 0.97/0.87).
-- **basic_prompt = low precision, decent recall** → covers the requirements but bolts
-  on non-traceable detail (the Implementation-Bias phenomenon RQ1 is about).
-- **Caveat:** low Align recall ≠ dropped requirement. It is graded entailment; a
-  requirement that is present but reworded/compressed scores < 1. Verified: Claude
-  strict keeps all four nav buttons yet the "must contain four buttons" sentence
-  scores 0.18 because the candidate lists them without asserting "four". Read low
-  recall as a **flag to inspect**, not proof of loss.
-- **Caveat:** ground truths are **drafts**; numbers are provisional until the expert
-  gold list. BERTScore rows for the 8 long candidates are truncated at 512 tokens.
+- **Consolidation raises traceability** (AlignScore), every agent: e.g.
+  simple_portal Claude **0.09 → 0.99**, hard_erp Gemini **0.42 → 0.85** (basic → strict).
+- **strict > loose** as well: the explicit traceability constraint strips
+  non-traceable content the loose variant keeps (hard_erp Claude: loose 0.30 →
+  strict 0.76).
+- **basic_prompt = low AlignScore** → it states a lot of content the GT does not
+  support, i.e. non-traceable detail bolted onto the actual requirements (the
+  Implementation-Bias phenomenon RQ1 is about).
+- **Dropped requirements** are not visible in AlignScore (it only measures the
+  injection direction); they are caught in the manual traceability pass.
+- **Caveat:** ground truths are **drafts**; numbers are provisional. BERTScore rows
+  for the 8 long candidates are truncated at 512 tokens (AlignScore is not).
 
 ---
 

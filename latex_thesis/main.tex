@@ -1,0 +1,133 @@
+% =============================================================
+% main.tex -- Bachelor Thesis skeleton
+% Vietnamese-German University, Faculty of Engineering, CS Program
+%
+% HOW TO COMPILE (see README.md for details):
+%   pdflatex main.tex
+%   bibtex main
+%   pdflatex main.tex
+%   pdflatex main.tex
+% =============================================================
+\documentclass[12pt]{report}
+
+% ---------- Page geometry (single-spaced, numbered pages by default) ----------
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{times}          % swap for another 12pt-friendly font if your dept prefers
+\usepackage{microtype}
+\usepackage{indentfirst}    % indent the first line of every paragraph, including after a heading
+
+% ---------- Figures, tables, listings ----------
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}          % >{\centering\arraybackslash}p{} column type for wrapping table headers
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{longtable}      % for the appendix 18-row results table spanning pages
+\usepackage{pifont}         % \ding{51}/\ding{55} checkmarks/crosses used in the positioning table
+\usepackage{tikz}           % for the conflict-example diagram (fig:conflict-example)
+\usetikzlibrary{positioning, arrows.meta}
+\usepackage{pdfpages}       % \includepdf for the official cover page (cover.pdf)
+
+% ---------- Cross-references ----------
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=black,
+  urlcolor=blue,
+  pdftitle={AI-Assisted Master Prompt Generation. Challenges and Proposed Solutions.},
+}
+\usepackage[capitalise,noabbrev]{cleveref}
+% cleveref does not know the `listings` package's lstlisting counter/name by
+% default; needed for \cref{lst:governance} (App. B.1) to print "Listing N"
+% instead of falling back to a bare number.
+\crefname{lstlisting}{listing}{listings}
+\Crefname{lstlisting}{Listing}{Listings}
+
+% ---------- Bibliography (natbib + bibtex) ----------
+% Using classic bibtex instead of biblatex+biber: biber is noticeably
+% heavier to invoke and is a common cause of "compile timed out" on
+% Overleaf's free plan for even modest documents. natbib+bibtex is lighter
+% and sufficient for this document's citation style.
+% Author-year (not numbered): the prose throughout this thesis is written
+% assuming \citet renders as "Author (Year)" (e.g. "Mondal et al. (2024)
+% characterize..."), so the citation style must match -- see \bibliographystyle
+% below, which must be an author-year-compatible .bst (not unsrtnat).
+\usepackage[authoryear,round]{natbib}
+
+% ---------- Code listing style ----------
+\lstdefinestyle{mystyle}{
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{blue}\bfseries,
+  commentstyle=\color{gray}\itshape,
+  stringstyle=\color{purple!70!black},
+  numbers=none,
+  breaklines=true,
+  breakatwhitespace=true,
+  breakindent=0pt,
+  xleftmargin=0pt,
+  frame=single,
+  rulecolor=\color{black!30},
+  showstringspaces=false,
+  tabsize=2,
+  captionpos=b,
+}
+\lstset{style=mystyle}
+
+\title{AI-Assisted Master Prompt Generation. Challenges and Proposed Solutions.}
+\author{Nguyen Thanh Tu}
+\date{2026}
+
+\begin{document}
+
+% ================= COVER PAGE (VGU format) =================
+\includepdf[pages=-]{cover.pdf}
+
+% ================= DECLARATION =================
+\input{declaration}
+
+% ================= FRONT MATTER =================
+\pagenumbering{roman}
+\tableofcontents
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{List of Tables and Figures}
+\chapter*{List of Tables and Figures}
+\section*{Tables}
+\makeatletter
+\@starttoc{lot}
+\makeatother
+\section*{Figures}
+\makeatletter
+\@starttoc{lof}
+\makeatother
+\clearpage
+\pagenumbering{arabic}
+
+% ================= CHAPTERS =================
+\input{chapters/01_introduction}
+\input{chapters/02_related_work}
+\input{chapters/03_methodology}
+\input{chapters/04_experiment_traceability}
+\input{chapters/05_experiment_conflict}
+\input{chapters/06_discussion_future}
+\input{chapters/07_conclusion}
+
+% ================= REFERENCES =================
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+% ================= APPENDIX =================
+% Per the formatting rules: statistics, matrices, illustrations belong here
+% and are NOT counted in the 25-60 page body scope.
+\appendix
+\input{appendix/appendix_a_results}
+\input{appendix/appendix_b_datasets}
+
+\end{document}

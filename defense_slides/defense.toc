@@ -1,0 +1,7 @@
+\beamer@sectionintoc {1}{Motivation \& Problem}{3}{0}{1}
+\beamer@sectionintoc {2}{Research Questions \& Contributions}{8}{0}{2}
+\beamer@sectionintoc {3}{Related Work}{11}{0}{3}
+\beamer@sectionintoc {4}{Methodology}{14}{0}{4}
+\beamer@sectionintoc {5}{Experiment 1: Traceability Evaluation}{17}{0}{5}
+\beamer@sectionintoc {6}{Experiment 2: Semantic Conflict Handling}{28}{0}{6}
+\beamer@sectionintoc {7}{Conclusion}{37}{0}{7}
