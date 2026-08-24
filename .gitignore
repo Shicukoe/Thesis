@@ -44,3 +44,33 @@ skills-lock.json
 # ===== Third-party paper PDFs (copyrighted) =====
 # Remove this line if the repo is PRIVATE and you want to keep the papers.
 papers/
+
+# ===== Third-party trademarked logos (ChatGPT/Claude/Gemini icons) =====
+icons/
+defense_slides/assets/chatgpt-icon.*
+defense_slides/assets/claude-icon.*
+defense_slides/assets/gemini-icon.*
+defense_slides/assets/VGU-Logo.*
+
+# ===== Internal AI-assisted revision/planning notes (not for public repo) =====
+defense_slides/defense8_targeted_slide_fixes.md
+defense_slides/experiment2_slide_revision_proposal.md
+defense_slides/master_prompt_defense_experiment_focus_revision_guide.md
+defense_slides/master_prompt_defense_revision_15_20min_v3.md
+defense_slides/master_prompt_defense_text_header_revision.md
+defense_slides/master_prompt_rewrite_bachelor_thesis_defense.md
+defense_slides/professor_review_master_prompt_defense_demo_and_improvements.md
+
+# ===== LaTeX build artifacts =====
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+defense_slides/preview/
