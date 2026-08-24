@@ -69,12 +69,9 @@ throughout the session, instead of reconstructing the whole history in one pass 
 
 ```
 10422080_NguyenThanhTu_Bachelor Thesis Report.pdf   final compiled report (read this first)
-latex_thesis/           LaTeX source for the report above
 defense_slides/         thesis defense deck (PDF)
 Evaluation/             traceability/conflict scoring harness, data, and results (see its own README)
 ```
 
 See [`Evaluation/README.md`](Evaluation/README.md) for how the AlignScore/BERTScore
-harness works and how to reproduce the numbers, and
-[`latex_thesis/README.md`](latex_thesis/README.md) for how to recompile the report from
-source.
+harness works and how to reproduce the numbers.
