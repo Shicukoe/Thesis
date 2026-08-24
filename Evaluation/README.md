@@ -135,24 +135,25 @@ candidate requirement is non-traceable. Grounded in Pyramid/SCU (Nenkova &
 Passonneau 2004), FACTScore atomic facts (Min et al. 2023), and the sentence-matrix
 aggregation of SummaC (Laban et al. 2022).
 
-## Environments (everything on D: — the C: drive is nearly full)
+## Environments
 
 Two isolated venvs, because AlignScore pins old dependencies (torch 1.12.1,
 transformers 4.30) that conflict with BERTScore's modern stack:
 
 | venv | Python | Holds | Model cache |
 |---|---|---|---|
-| `.venv/` | 3.13 | BERTScore (`bert-score`, modern torch) | `C:\Users\Admin\.cache\huggingface` (deberta already there) |
-| `.venv-align/` | 3.10 | AlignScore (`alignscore`, torch 1.12.1 CPU) | `.models/hf` on D |
+| `.venv/` | 3.13 | BERTScore (`bert-score`, modern torch) | default HF cache (`~/.cache/huggingface`) |
+| `.venv-align/` | 3.10 | AlignScore (`alignscore`, torch 1.12.1 CPU) | `.models/hf` (local to this folder) |
 
-All AlignScore artifacts live under `.models/` on D: the repo clone, the
+All AlignScore artifacts live under `.models/` (repo-local, gitignored): the
 `AlignScore-large.ckpt` (~4.6 GB, used by default) and optionally `AlignScore-base.ckpt`
 (~1.9 GB, `--size base`), the HF cache, and the pip/tmp caches. Set the
-redirect env vars before running anything in the align venv:
+redirect env vars before running anything in the align venv (point them anywhere with
+enough free disk space if `.models/` isn't practical on your machine):
 
 ```bash
-export HF_HOME="D:/Coding_Stuffs/Thesis/Evaluation/.models/hf"
-export TMPDIR="D:/Coding_Stuffs/Thesis/Evaluation/.models/tmp"
+export HF_HOME="$(pwd)/.models/hf"
+export TMPDIR="$(pwd)/.models/tmp"
 ```
 
 ## Install
@@ -163,10 +164,10 @@ py -m venv .venv
 .venv/Scripts/python.exe -m pip install -r requirements.txt
 ```
 
-**AlignScore venv** (Python 3.10, CPU torch, caches forced to D):
+**AlignScore venv** (Python 3.10, CPU torch, caches kept repo-local under `.models/`):
 ```bash
-export PIP_CACHE_DIR="D:/Coding_Stuffs/Thesis/Evaluation/.models/pipcache"
-export TMPDIR="D:/Coding_Stuffs/Thesis/Evaluation/.models/tmp"
+export PIP_CACHE_DIR="$(pwd)/.models/pipcache"
+export TMPDIR="$(pwd)/.models/tmp"
 <py3.10> -m venv .venv-align
 .venv-align/Scripts/python.exe -m pip install "torch==1.12.1+cpu" --index-url https://download.pytorch.org/whl/cpu
 git clone --depth 1 https://github.com/yuh-zha/AlignScore.git .models/AlignScore
@@ -174,7 +175,7 @@ git clone --depth 1 https://github.com/yuh-zha/AlignScore.git .models/AlignScore
 .venv-align/Scripts/python.exe -m pip install "transformers==4.30.2"   # downgrade for torch 1.12 compat
 .venv-align/Scripts/python.exe -m spacy download en_core_web_sm
 .venv-align/Scripts/python.exe -c "import nltk; nltk.download('punkt_tab'); nltk.download('punkt')"
-# checkpoint -> D: (large is the one actually used by default; base is optional)
+# checkpoints (large is the one actually used by default; base is optional)
 curl -L -o .models/AlignScore-large.ckpt https://huggingface.co/yzha/AlignScore/resolve/main/AlignScore-large.ckpt
 curl -L -o .models/AlignScore-base.ckpt https://huggingface.co/yzha/AlignScore/resolve/main/AlignScore-base.ckpt
 ```

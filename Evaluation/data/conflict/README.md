@@ -23,7 +23,6 @@ isolation prompt (see `../spec_guided/RUN.md`).
 - `hard_erp_labels.json` — the 4 conflicts, mapped to prompt numbers (reference; **do not give to the model**)
 - `hard_erp_conflict_prompts.md` — the **3 condition prompts** (run these), handoff form
 - `simple_portal_conflict_history.md` / `simple_portal_conflict_prompts.md` / `simple_portal_labels.json` — the same two-phase handoff on the smaller button-count case (M = four buttons; prompt 14 presupposes five = conflict; prompt 15 restates four = positive control)
-- `RQ3_motivation_and_design.md` — rationale
 - `results/<project>__<model>.md` — fill in per model
 
 ## The 3 conditions (in order; each: Step 0 → present M → feed 46–49 → closing instruction)
